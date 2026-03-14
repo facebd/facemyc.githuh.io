@@ -252,6 +252,53 @@
     .folder-item:hover .folder-ops { opacity: 1; }
 
     /* ═══════════════════════════════════════════
+       ACTIVITY LOG STYLES
+       ═══════════════════════════════════════════ */
+    #activity-modal-overlay {
+        display: none; position: fixed; inset: 0;
+        background: rgba(0,0,0,0.88); z-index: 5000;
+        align-items: flex-start; justify-content: center;
+        padding: 0; backdrop-filter: blur(6px);
+    }
+    #activity-modal-overlay.open { display: flex; }
+    #activity-modal-box {
+        width: 100%; max-width: 700px; height: 100vh;
+        background: #08080c; border-right: 1px solid #2a2a3a;
+        display: flex; flex-direction: column;
+        animation: actModalIn 0.25s ease;
+        overflow: hidden; margin: 0; align-self: stretch;
+    }
+    @keyframes actModalIn { from { opacity: 0; transform: translateX(-30px); } to { opacity: 1; transform: none; } }
+
+    .act-header {
+        padding: 14px 20px; border-bottom: 1px solid #1a1a24;
+        display: flex; align-items: center; justify-content: space-between;
+        flex-shrink: 0; background: #0a0a10;
+    }
+    .act-title { font-family: 'Fira Code', monospace; font-size: 13px; font-weight: 700; letter-spacing: 2px; color: var(--neon-main); }
+    .act-sub { font-size: 10px; color: #444; font-family: 'Fira Code', monospace; margin-top: 2px; }
+    .act-body { flex: 1; overflow-y: auto; padding: 14px 16px; }
+
+    .log-card { background: #0d0d12; border: 1px solid #1e1e2e; border-radius: 10px; padding: 13px 15px; margin-bottom: 9px; transition: border-color 0.2s; }
+    .log-card:hover { border-color: rgba(0,255,0,0.1); }
+    .log-card-top { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 7px; margin-bottom: 9px; }
+    .log-badge { font-family: 'Fira Code', monospace; font-size: 11px; font-weight: 700; border-radius: 5px; padding: 2px 9px; border: 1px solid; }
+    .log-badge-master { background: rgba(245,158,11,0.12); color: #f59e0b; border-color: rgba(245,158,11,0.3); }
+    .log-badge-code   { background: rgba(124,58,237,0.12); color: #a78bfa; border-color: rgba(124,58,237,0.3); }
+    .log-badge-face   { background: rgba(0,243,255,0.1);   color: var(--neon-blue); border-color: rgba(0,243,255,0.25); }
+    .log-status-ok   { font-size: 10px; font-weight: 700; color: #10b981; background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.3); border-radius: 5px; padding: 2px 8px; }
+    .log-status-fail { font-size: 10px; font-weight: 700; color: #ef4444; background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); border-radius: 5px; padding: 2px 8px; }
+    .log-time { font-size: 11px; color: #555; font-family: 'Fira Code', monospace; }
+    .log-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(175px, 1fr)); gap: 6px; }
+    .log-item { background: #111118; border-radius: 6px; padding: 7px 10px; }
+    .log-item-label { font-size: 9px; color: #555; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 3px; }
+    .log-item-value { font-size: 11px; color: #ccc; font-family: 'Fira Code', monospace; word-break: break-all; }
+    .log-item-value a { color: var(--neon-blue); text-decoration: none; }
+    .log-fail-reason { font-size: 11px; color: #ef4444; margin-bottom: 8px; padding: 5px 9px; background: rgba(239,68,68,0.05); border-radius: 5px; }
+    .act-empty { text-align: center; padding: 60px 20px; color: #444; font-size: 13px; font-family: 'Fira Code', monospace; }
+    .act-spinner { display: flex; justify-content: center; padding: 40px; }
+
+    /* ═══════════════════════════════════════════
        FACE UNLOCK STYLES
        ═══════════════════════════════════════════ */
     #face-layer {
@@ -439,6 +486,28 @@
 </div>
 
 <!-- ═══════════════════════════════════════
+     ACTIVITY LOG MODAL
+     ═══════════════════════════════════════ -->
+<div id="activity-modal-overlay">
+    <div id="activity-modal-box">
+        <div class="act-header">
+            <div>
+                <div class="act-title">📊 ACCESS ACTIVITY LOG</div>
+                <div class="act-sub">প্রতিটি login এর IP, device, time সহ সব তথ্য</div>
+            </div>
+            <div style="display:flex;gap:8px;align-items:center;">
+                <button class="btn btn-danger" style="padding:5px 12px;font-size:11px;" onclick="clearActivityLog()">🗑 CLEAR ALL</button>
+                <button class="btn btn-ghost" style="padding:5px 12px;font-size:11px;" onclick="refreshActivityLog()">↺ REFRESH</button>
+                <button class="btn btn-ghost" style="padding:5px 12px;font-size:11px;" onclick="closeActivityLog()">✕ CLOSE</button>
+            </div>
+        </div>
+        <div class="act-body" id="activity-log-body">
+            <div class="act-spinner"><div class="spinner" style="width:32px;height:32px;border-width:2px;"></div></div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════
      FACE UNLOCK LAYER  
      ═══════════════════════════════════════ -->
 <div id="face-layer">
@@ -526,6 +595,7 @@
             <button class="btn btn-info" onclick="toggleMarkdown()" title="Split Preview"><i class="fas fa-columns"></i> MD</button>
             <button class="btn" onclick="toggleCommandPalette()" title="Command Palette (Ctrl+Shift+P)"><i class="fas fa-terminal"></i></button>
             <button class="btn" id="passcode-mgr-btn" onclick="openPasscodeManager()" title="Passcode Management" style="display:none;color:var(--neon-yellow);border-color:#554400;"><i class="fas fa-key"></i></button>
+            <button class="btn" id="activity-log-btn" onclick="openActivityLog()" title="Access Activity Log" style="display:none;color:var(--neon-blue);border-color:#004d4d;"><i class="fas fa-chart-bar"></i></button>
             <button class="btn" onclick="openSettings()" title="Themes & Settings"><i class="fas fa-cog"></i></button>
             <button class="btn" onclick="openExportMenu()" title="Export"><i class="fas fa-file-export"></i></button>
             <button class="btn" onclick="showShortcuts()" title="Keyboard Shortcuts (Ctrl+/)"><i class="fas fa-keyboard"></i></button>
@@ -676,6 +746,7 @@
             btn.disabled = false; btn.innerText = 'ACCESS NOTEPAD →';
             _isMaster = true; _isUser = true;
             await launchApp('MASTER ACCESS', false);
+            logLoginActivity('MASTER ACCESS', 'MASTER', true);
             return;
         }
 
@@ -695,7 +766,9 @@
             }
             if (!matched) {
                 err.textContent = '⛔ ' + (errMsg || 'Wrong passcode!');
-                err.style.display = 'block'; btn.disabled = false; btn.innerText = 'ACCESS NOTEPAD →'; return;
+                err.style.display = 'block'; btn.disabled = false; btn.innerText = 'ACCESS NOTEPAD →';
+                logLoginActivity(input, 'PASSCODE', false, errMsg || 'Wrong passcode');
+                return;
             }
             try {
                 const updateData = { usedCount: (matched.usedCount || 0) + 1 };
@@ -710,6 +783,7 @@
             btn.disabled = false; btn.innerText = 'ACCESS NOTEPAD →';
             _isUser = true; _isMaster = false;
             await launchApp('USER: ' + (matched.label||'USER').toUpperCase(), true);
+            logLoginActivity((matched.label||'USER'), 'PASSCODE', true);
         } catch(e) {
             err.textContent = '⛔ Error: ' + e.message;
             err.style.display = 'block'; btn.disabled = false; btn.innerText = 'ACCESS NOTEPAD →';
@@ -737,6 +811,8 @@
             '<span>' + label + roTag + '</span> <i class="fas fa-wifi" style="color:' + (isPasscodeUser ? 'var(--neon-blue)' : 'var(--neon-main)') + ';"></i>';
         const pcBtn = document.getElementById('passcode-mgr-btn');
         if (pcBtn) pcBtn.style.display = _readOnly ? 'none' : 'inline-block';
+        const actBtn = document.getElementById('activity-log-btn');
+        if (actBtn) actBtn.style.display = _readOnly ? 'none' : 'inline-block';
         if (_readOnly) {
             document.getElementById('doc-body').setAttribute('readonly', true);
             document.getElementById('doc-title').setAttribute('readonly', true);
@@ -1020,6 +1096,7 @@
             currentUser = 'shared';
             try { auth.signInAnonymously(); } catch(e) {}
             showApp('FACE: ' + name.toUpperCase(), false);
+            logLoginActivity(name, 'FACE', true);
             logActivity('FACE UNLOCK: ' + name.toUpperCase(), 'success');
         }, 1800);
     }
@@ -1269,6 +1346,7 @@
         if (user && user.email) {
             _isMaster = false; _isUser = false;
             showApp('ADMIN: ' + user.email.split('@')[0].toUpperCase(), false);
+            logLoginActivity('ADMIN: ' + user.email.split('@')[0], 'ADMIN', true);
         } else if (!user) {
             // শুধু তখনই landing দেখাও যখন app layer visible আছে কিন্তু face layer না
             if (document.getElementById('app-layer').style.display === 'flex' && 
@@ -2353,6 +2431,157 @@
     });
 
     setInterval(() => { document.getElementById('clock-display').innerText = new Date().toLocaleTimeString(); }, 1000);  
+
+    // ═══════════════════════════════════════════════════════
+    // ACTIVITY LOG SYSTEM
+    // ═══════════════════════════════════════════════════════
+
+    function normalizeISP(org) {
+        if (!org || org === '?') return '?';
+        const o = org.toLowerCase();
+        if (o.includes('grameenphone') || o.includes(' gp')) return 'Grameenphone (GP)';
+        if (o.includes('axiata') || o.includes('robi')) return 'Robi Axiata';
+        if (o.includes('airtel')) return 'Airtel Bangladesh';
+        if (o.includes('banglalink') || o.includes('vimpelcom')) return 'Banglalink';
+        if (o.includes('teletalk')) return 'Teletalk';
+        if (o.includes('btcl') || o.includes('bangladesh telegraph')) return 'BTCL';
+        if (o.includes('link3')) return 'Link3 Technologies';
+        if (o.includes('metronet')) return 'Metronet Bangladesh';
+        if (o.includes('dhaka fiber') || o.includes('dhakafiber')) return 'Dhaka Fiber Net';
+        if (o.includes('amberit') || o.includes('amber')) return 'Amber IT';
+        if (o.includes('bracnet')) return 'BRACNet';
+        if (o.includes('agni')) return 'Agni Systems';
+        if (o.includes('ranks')) return 'Ranks ITT';
+        if (o.includes('carnival')) return 'Carnival Internet';
+        return org.replace(/^AS\d+\s*/, '').trim() || org;
+    }
+
+    async function logLoginActivity(loginLabel, loginType, success, failReason = '') {
+        try {
+            let ipInfo = { ip: 'Unknown', city: 'Unknown', country: 'Unknown', org: 'Unknown', latitude: '?', longitude: '?' };
+            try {
+                const r = await fetch('https://blue-fog-786d.csm-mohasin-com.workers.dev/', { signal: AbortSignal.timeout(6000) });
+                const d = await r.json();
+                ipInfo = {
+                    ip: d.ip || 'Unknown',
+                    city: d.city || '?',
+                    country: d.country === 'BD' ? 'Bangladesh' : (d.country || '?'),
+                    org: normalizeISP(d.org || '?'),
+                    latitude: d.latitude || '?',
+                    longitude: d.longitude || '?'
+                };
+            } catch(e) {}
+
+            const ua = navigator.userAgent;
+            let device = 'Unknown', browser = 'Unknown', os = 'Unknown';
+            if (/Android/i.test(ua)) os = 'Android';
+            else if (/iPhone|iPad/i.test(ua)) os = 'iOS';
+            else if (/Windows/i.test(ua)) os = 'Windows';
+            else if (/Mac/i.test(ua)) os = 'Mac';
+            else if (/Linux/i.test(ua)) os = 'Linux';
+            if (/Chrome/i.test(ua) && !/Edg/i.test(ua)) browser = 'Chrome';
+            else if (/Firefox/i.test(ua)) browser = 'Firefox';
+            else if (/Safari/i.test(ua) && !/Chrome/i.test(ua)) browser = 'Safari';
+            else if (/Edg/i.test(ua)) browser = 'Edge';
+            if (/Mobile/i.test(ua)) device = 'Mobile';
+            else if (/Tablet/i.test(ua)) device = 'Tablet';
+            else device = 'Desktop';
+
+            await db.ref('activity_logs').push({
+                loginLabel, loginType, success, failReason,
+                ip: ipInfo.ip, city: ipInfo.city, country: ipInfo.country, isp: ipInfo.org,
+                latitude: ipInfo.latitude, longitude: ipInfo.longitude,
+                device, browser, os,
+                userAgent: ua.substring(0, 200),
+                screen: screen.width + 'x' + screen.height,
+                language: navigator.language || '?',
+                timestamp: Date.now(),
+                timeStr: new Date().toLocaleString('bn-BD', { timeZone: 'Asia/Dhaka' })
+            });
+        } catch(e) { console.warn('Activity log failed:', e); }
+    }
+
+    function _escHtml(str) {
+        return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    function openActivityLog() {
+        document.getElementById('activity-modal-overlay').classList.add('open');
+        loadActivityLog();
+    }
+    function closeActivityLog() {
+        document.getElementById('activity-modal-overlay').classList.remove('open');
+    }
+    function refreshActivityLog() { loadActivityLog(); }
+
+    async function loadActivityLog() {
+        const body = document.getElementById('activity-log-body');
+        body.innerHTML = '<div class="act-spinner"><div style="width:32px;height:32px;border:2px solid #2a2a3a;border-top-color:#0f0;border-radius:50%;animation:spin 0.8s linear infinite;"></div></div>';
+        try {
+            const snap = await db.ref('activity_logs').once('value');
+            const raw = snap.val() || {};
+            const logs = Object.entries(raw).map(([id, d]) => ({ id, ...d })).sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+
+            if (!logs.length) {
+                body.innerHTML = '<div class="act-empty"><div style="font-size:36px;margin-bottom:10px;opacity:0.3;">📋</div><div>কোনো activity নেই এখনো</div></div>';
+                return;
+            }
+
+            body.innerHTML = logs.map(log => {
+                const typeLabel = log.loginType === 'MASTER'   ? '<span class="log-badge log-badge-master">👑 MASTER</span>'
+                                : log.loginType === 'FACE'     ? `<span class="log-badge log-badge-face">👁 FACE: ${_escHtml(log.loginLabel)}</span>`
+                                : log.loginType === 'ADMIN'    ? `<span class="log-badge log-badge-master">🔐 ADMIN</span>`
+                                : `<span class="log-badge log-badge-code">🔑 ${_escHtml(log.loginLabel||'USER')}</span>`;
+                const statusEl = log.success
+                    ? '<span class="log-status-ok">✅ Success</span>'
+                    : '<span class="log-status-fail">❌ Failed</span>';
+                const coordEl = (log.latitude && log.latitude !== '?')
+                    ? `<div class="log-item"><div class="log-item-label">🗺️ Coordinates</div><div class="log-item-value"><a href="https://maps.google.com/?q=${log.latitude},${log.longitude}" target="_blank">${log.latitude}, ${log.longitude} ↗</a></div></div>`
+                    : '';
+                const failEl = (!log.success && log.failReason)
+                    ? `<div class="log-fail-reason">⚠️ ${_escHtml(log.failReason)}</div>`
+                    : '';
+
+                return `<div class="log-card">
+                    <div class="log-card-top">
+                        <div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap;">
+                            ${typeLabel}
+                            ${statusEl}
+                        </div>
+                        <span class="log-time">🕐 ${_escHtml(log.timeStr || new Date(log.timestamp).toLocaleString())}</span>
+                    </div>
+                    ${failEl}
+                    <div class="log-grid">
+                        <div class="log-item"><div class="log-item-label">🌐 IP Address</div><div class="log-item-value">${_escHtml(log.ip||'?')}</div></div>
+                        <div class="log-item"><div class="log-item-label">📍 Location</div><div class="log-item-value">${_escHtml((log.city||'?')+', '+(log.country||'?'))}</div></div>
+                        <div class="log-item"><div class="log-item-label">🏢 ISP / Org</div><div class="log-item-value">${_escHtml(log.isp||'?')}</div></div>
+                        ${coordEl}
+                        <div class="log-item"><div class="log-item-label">📱 Device</div><div class="log-item-value">${_escHtml((log.device||'?')+' · '+(log.os||'?'))}</div></div>
+                        <div class="log-item"><div class="log-item-label">🌍 Browser</div><div class="log-item-value">${_escHtml(log.browser||'?')}</div></div>
+                        <div class="log-item"><div class="log-item-label">🗣️ Language</div><div class="log-item-value">${_escHtml(log.language||'?')}</div></div>
+                        <div class="log-item"><div class="log-item-label">🖥️ Screen</div><div class="log-item-value">${_escHtml(log.screen||'?')}</div></div>
+                    </div>
+                </div>`;
+            }).join('');
+        } catch(err) {
+            body.innerHTML = `<p style="color:#ef4444;font-size:12px;padding:16px;">Error: ${err.message}</p>`;
+        }
+    }
+
+    async function clearActivityLog() {
+        const yes = await SystemUI.confirm('CLEAR ALL LOGS?', 'সব activity log permanently delete হবে।', true);
+        if (!yes) return;
+        try {
+            await db.ref('activity_logs').remove();
+            logActivity('ACTIVITY LOGS CLEARED', 'error');
+            loadActivityLog();
+        } catch(e) { logActivity('FAILED: ' + e.message, 'error'); }
+    }
+
+    // ESC দিয়ে activity modal বন্ধ
+    document.getElementById('activity-modal-overlay').addEventListener('click', (e) => {
+        if (e.target === document.getElementById('activity-modal-overlay')) closeActivityLog();
+    });
 
     if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});  
 </script>
