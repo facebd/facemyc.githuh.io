@@ -75,10 +75,22 @@
     /* --- App Layout --- */  
     #app-layer { display: none; width: 100%; height: 100%; flex-direction: column; }  
     header {  
-        height: 50px; border-bottom: 2px solid var(--border-color);  
+        min-height: 50px; border-bottom: 2px solid var(--border-color);  
         display: flex; justify-content: space-between; align-items: center;  
-        padding: 0 20px; background: var(--bg-panel);  
-        z-index: 950; flex-shrink: 0;
+        padding: 0 12px; background: var(--bg-panel);  
+        z-index: 950; flex-shrink: 0; flex-wrap: wrap; gap: 4px;
+    }
+    .header-title-wrap { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+    .header-btns-wrap {
+        display: flex; align-items: center; flex-wrap: nowrap;
+        overflow-x: auto; gap: 0; flex: 1; justify-content: flex-end;
+        scrollbar-width: none;
+    }
+    .header-btns-wrap::-webkit-scrollbar { display: none; }
+    @media (max-width: 600px) {
+        header { padding: 6px 10px; min-height: auto; }
+        .header-title-wrap span { display: none; }
+        .btn { padding: 5px 8px; font-size: 0.75rem; margin-left: 3px; }
     }  
     .btn {  
         background: transparent; border: 1px solid var(--neon-dim);  
@@ -587,22 +599,20 @@
 <!-- APP LAYER -->
 <div id="app-layer">  
     <header>  
-        <div style="display: flex; align-items: center; gap: 15px;">  
+        <div class="header-title-wrap">  
             <button class="btn" onclick="toggleSidebar()" id="menu-btn" style="display:none;">≡</button>  
-            <div style="font-weight:600;"><i class="fas fa-terminal"></i>CSM MOHASIN NOTEPAD V2.0</div>  
+            <div style="font-weight:600;font-size:0.85rem;"><i class="fas fa-terminal"></i><span> CSM MOHASIN NOTEPAD V2.0</span></div>  
         </div>  
-        <div style="display:flex; align-items:center;">  
-            <button class="btn btn-info" onclick="toggleMarkdown()" title="Split Preview"><i class="fas fa-columns"></i> MD</button>
-            <button class="btn" onclick="toggleCommandPalette()" title="Command Palette (Ctrl+Shift+P)"><i class="fas fa-terminal"></i></button>
+        <div class="header-btns-wrap">  
+            <button class="btn btn-info" onclick="toggleMarkdown()" title="Split Preview"><i class="fas fa-columns"></i></button>
+            <button class="btn" onclick="toggleCommandPalette()" title="Command Palette"><i class="fas fa-terminal"></i></button>
             <button class="btn" id="passcode-mgr-btn" onclick="openPasscodeManager()" title="Passcode Management" style="display:none;color:var(--neon-yellow);border-color:#554400;"><i class="fas fa-key"></i></button>
-            <button class="btn" id="activity-log-btn" onclick="openActivityLog()" title="Access Activity Log" style="display:none;color:var(--neon-blue);border-color:#004d4d;"><i class="fas fa-chart-bar"></i></button>
-            <button class="btn" onclick="openSettings()" title="Themes & Settings"><i class="fas fa-cog"></i></button>
+            <button class="btn" id="activity-log-btn" onclick="openActivityLog()" title="Activity Log" style="display:none;color:var(--neon-blue);border-color:#004d4d;"><i class="fas fa-chart-bar"></i></button>
+            <button class="btn" onclick="openSettings()" title="Settings"><i class="fas fa-cog"></i></button>
             <button class="btn" onclick="openExportMenu()" title="Export"><i class="fas fa-file-export"></i></button>
-            <button class="btn" onclick="showShortcuts()" title="Keyboard Shortcuts (Ctrl+/)"><i class="fas fa-keyboard"></i></button>
-            
-            <span style="width:1px; height:20px; background:#333; margin:0 10px;"></span>
-            
-            <button class="btn" onclick="createNewNote()" title="New (Ctrl+N)">+ NEW</button>  
+            <button class="btn" onclick="showShortcuts()" title="Shortcuts"><i class="fas fa-keyboard"></i></button>
+            <span style="width:1px; height:20px; background:#333; margin:0 4px; flex-shrink:0;"></span>
+            <button class="btn" onclick="createNewNote()" title="New (Ctrl+N)">+</button>  
             <button class="btn" onclick="toggleFullScreen()"><i class="fas fa-expand"></i></button>
             <button class="btn btn-danger" onclick="confirmLogout()"><i class="fas fa-power-off"></i></button>  
         </div>  
