@@ -1,0 +1,2361 @@
+<!DOCTYPE html>  
+<html lang="en">  
+<head>  
+    <meta charset="UTF-8">  
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">  
+    <title>CSM MOHASIN NOTEPAD v2.0 [ULTIMATE]</title>  
+    <link rel="manifest" href="manifest.json">  
+    <meta name="theme-color" content="#020202">  
+    <meta name="apple-mobile-web-app-capable" content="yes">  
+  
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">  
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">  
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+<style>  
+    :root {  
+        --bg-deep: #020202;  
+        --bg-panel: #0d0d0d;  
+        --bg-hover: #1a1a1a;  
+        --neon-main: #0f0;  
+        --neon-dim: #004d00; 
+        --neon-red: #ff003c;  
+        --neon-blue: #00f3ff;  
+        --neon-yellow: #fcee0a;
+        --border-color: #333;  
+        --font-stack: 'Fira Code', monospace;  
+        --sidebar-width: 320px;   
+    }  
+
+    * { box-sizing: border-box; outline: none; }  
+    ::-webkit-scrollbar { width: 5px; height: 5px; }  
+    ::-webkit-scrollbar-track { background: var(--bg-deep); }  
+    ::-webkit-scrollbar-thumb { background: var(--neon-dim); }  
+
+    body {  
+        margin: 0; padding: 0;  
+        background-color: var(--bg-deep);  
+        color: var(--neon-main);  
+        font-family: var(--font-stack);  
+        height: 100vh; 
+        height: 100dvh; 
+        height: calc(var(--vh, 1vh) * 100); 
+        overflow: hidden;  
+        display: flex; flex-direction: column;  
+    }  
+
+    .crt::before {  
+        content: " "; display: block; position: absolute;  
+        top: 0; left: 0; bottom: 0; right: 0;  
+        background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));  
+        z-index: 900; background-size: 100% 2px, 3px 100%; pointer-events: none;  
+    }  
+
+    /* --- Auth Screen --- */  
+    #auth-layer {  
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;  
+        background: var(--bg-deep); z-index: 1000;  
+        display: flex; justify-content: center; align-items: center;  
+    }  
+    .login-box {  
+        width: 90%; max-width: 400px; padding: 40px;  
+        border: 2px solid var(--neon-main);  
+        background: rgba(0, 10, 0, 0.95);  
+        box-shadow: 0 0 20px var(--neon-dim);
+        text-align: center;  
+    }  
+    .login-input {  
+        width: 100%; padding: 12px; margin: 10px 0;  
+        background: black; border: 1px solid var(--neon-dim);  
+        color: var(--neon-main); font-family: var(--font-stack);  
+    }  
+    .login-input:focus { border-color: var(--neon-main); box-shadow: 0 0 5px var(--neon-dim); }
+
+    /* --- App Layout --- */  
+    #app-layer { display: none; width: 100%; height: 100%; flex-direction: column; }  
+    header {  
+        height: 50px; border-bottom: 2px solid var(--border-color);  
+        display: flex; justify-content: space-between; align-items: center;  
+        padding: 0 20px; background: var(--bg-panel);  
+        z-index: 950; flex-shrink: 0;
+    }  
+    .btn {  
+        background: transparent; border: 1px solid var(--neon-dim);  
+        color: var(--neon-main); padding: 5px 12px; cursor: pointer;  
+        font-family: var(--font-stack); font-size: 0.8rem; margin-left: 5px; 
+        transition: 0.2s;
+    }  
+    .btn:hover, .btn:focus { background: var(--neon-main); color: black; box-shadow: 0 0 10px var(--neon-dim); }
+    .btn.active { background: var(--neon-main); color: black; }
+    
+    .btn-danger { color: var(--neon-red); border-color: #500; }
+    .btn-danger:hover, .btn-danger:focus { background: var(--neon-red); color: white; box-shadow: 0 0 15px var(--neon-red); }
+    
+    .btn-info { color: var(--neon-blue); border-color: #004d4d; }
+    .btn-info:hover, .btn-info:focus { background: var(--neon-blue); color: black; box-shadow: 0 0 15px var(--neon-blue); }
+      
+    .workspace { display: flex; flex: 1; overflow: hidden; position: relative; }  
+    aside { width: var(--sidebar-width); background: var(--bg-panel); border-right: 2px solid var(--border-color); display: flex; flex-direction: column; z-index: 910; transition: 0.3s;}  
+    
+    .search-container { padding: 10px; position: relative; border-bottom: 1px solid #111; display: flex; gap: 5px; }
+    .search-bar {
+        width: 100%; padding: 8px 8px 8px 30px;
+        background: black; border: 1px solid var(--border-color);
+        color: white; font-family: var(--font-stack);
+    }
+    .search-icon { position: absolute; left: 20px; top: 20px; color: #555; font-size: 0.8rem; }
+    .user-info { padding: 10px 15px; font-size: 0.7rem; color: var(--neon-blue); border-bottom: 1px dashed #222; display: flex; justify-content: space-between; cursor: pointer;}
+
+    .tag-cloud { padding: 10px; border-bottom: 1px solid #222; display: flex; flex-wrap: wrap; gap: 5px; max-height: 80px; overflow-y: auto;}
+    .tag-pill { font-size: 0.7rem; background: #111; padding: 2px 6px; border: 1px solid #333; cursor: pointer; color: #888; }
+    .tag-pill:hover, .tag-pill.active { border-color: var(--neon-main); color: var(--neon-main); }
+
+    .notes-list { flex: 1; overflow-y: auto; }  
+    
+    .note-item { padding: 12px 20px; border-bottom: 1px solid #111; cursor: pointer; transition: 0.2s; position: relative; display: flex; justify-content: space-between; align-items: center; }  
+    .note-item:hover { background: var(--bg-hover); }  
+    .note-item.active { background: rgba(0, 255, 0, 0.05); border-right: 4px solid var(--neon-main); }
+    .note-item.selected { background: rgba(0, 255, 0, 0.1); border-left: 4px solid var(--neon-main); }
+    .note-item .pin-icon { opacity: 0; font-size: 0.7rem; color: var(--neon-yellow); }
+    .note-item.pinned .pin-icon { opacity: 1; }
+    
+    .custom-checkbox { 
+        width: 16px; height: 16px; margin-right: 12px; border: 1px solid var(--neon-dim); 
+        display: flex; align-items: center; justify-content: center; font-size: 0.7rem; color: var(--neon-main);
+    }
+    .custom-checkbox.checked { background: var(--neon-dim); }
+    .custom-checkbox.checked::after { content: '✓'; }
+
+    main { flex: 1; display: flex; flex-direction: column; background: var(--bg-deep); position: relative; }  
+    
+    .editor-toolbar {
+        display: flex; align-items: center; border-bottom: 1px dashed #333; padding: 5px 20px;
+        background: #050505; flex-shrink: 0;
+    }
+    #doc-title { flex: 1; padding: 10px; background: transparent; border: none; color: var(--neon-main); font-family: var(--font-stack); font-size: 1.2rem; }  
+    
+    #date-display { font-size: 0.65rem; color: #555; margin-right: 15px; white-space: nowrap; }
+
+    .split-view { display: flex; flex: 1; overflow: hidden; position: relative; }
+    #doc-body { flex: 1; padding: 30px; background: transparent; border: none; color: #ccc; font-family: var(--font-stack); font-size: 1rem; resize: none; line-height: 1.6; z-index: 10; width: 100%; }  
+    
+    #md-preview { 
+        flex: 1; padding: 30px; background: #080808; 
+        color: #aaa; overflow-y: auto; 
+        border-left: 1px solid #333; 
+        display: none; 
+        font-family: sans-serif;
+    }
+    #md-preview.active { display: block; }
+    #md-preview h1, #md-preview h2 { color: var(--neon-main); border-bottom: 1px solid #333; padding-bottom: 5px; }
+    #md-preview code { background: #222; padding: 2px 5px; color: var(--neon-yellow); font-family: var(--font-stack); }
+    #md-preview blockquote { border-left: 3px solid var(--neon-blue); margin-left: 0; padding-left: 10px; color: var(--neon-blue); }
+
+    .status-bar { height: 30px; background: var(--bg-panel); border-top: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; padding: 0 15px; font-size: 0.75rem; z-index: 950; flex-shrink: 0;}  
+
+    #bulk-toolbar {
+        background: #111; padding: 10px; border-top: 1px solid var(--neon-main);
+        display: none; flex-direction: column; gap: 5px;
+    }
+    #bulk-toolbar.visible { display: flex; animation: slideUp 0.2s ease-out; }
+    @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+
+    /* --- Modals --- */
+    #modal-overlay {
+        display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0,0,0,0.85); z-index: 3000;
+        justify-content: center; align-items: center;
+        backdrop-filter: blur(2px);
+    }
+    .modal-box {
+        width: 450px; max-width: 90%; padding: 25px;
+        background: #000; border: 2px solid;
+        box-shadow: 0 0 30px rgba(0,0,0,0.8);
+        text-align: center;
+        animation: popIn 0.2s ease-out;
+        border-color: var(--neon-main);
+        display: flex; flex-direction: column;
+    }
+    .modal-header { font-size: 1.2rem; font-weight: bold; margin-bottom: 15px; color: var(--neon-main); border-bottom: 1px solid #333; padding-bottom: 10px;}
+    .modal-body { text-align: left; max-height: 50vh; overflow-y: auto; margin-bottom: 20px; color: #ccc; font-size: 0.9rem; }
+    
+    .shortcut-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+    .shortcut-table td { padding: 5px; border-bottom: 1px solid #222; }
+    .shortcut-table .key { color: var(--neon-yellow); font-weight: bold; }
+    .shortcut-table .desc { color: #aaa; text-align: right; }
+    .shortcut-cat { color: var(--neon-blue); padding-top: 10px; font-weight: bold; border:none!important; }
+
+    .modal-input {
+        width: 100%; padding: 10px; background: #111; border: 1px solid #444; color: white;
+        font-family: var(--font-stack); margin-top: 10px;
+    }
+    .modal-input:focus { border-color: var(--neon-main); }
+    .modal-actions { display: flex; gap: 10px; justify-content: flex-end; }
+
+    .theme-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .theme-opt { padding: 10px; border: 1px solid #333; cursor: pointer; text-align: center; }
+    .theme-opt:hover { border-color: white; }
+
+    /* --- Command Palette --- */
+    #cmd-palette {
+        display: none; position: fixed; top: 10%; left: 50%; transform: translateX(-50%);
+        width: 600px; max-width: 90%; background: #0a0a0a;
+        border: 1px solid var(--neon-main);
+        box-shadow: 0 0 50px rgba(0,0,0,0.9);
+        z-index: 4000; flex-direction: column;
+        border-radius: 4px;
+        animation: popIn 0.1s ease-out;
+    }
+    #cmd-input {
+        width: 100%; padding: 15px; background: transparent; border: none; border-bottom: 1px solid #222;
+        color: white; font-family: var(--font-stack); font-size: 1.1rem;
+    }
+    #cmd-list { max-height: 300px; overflow-y: auto; }
+    .cmd-item {
+        padding: 10px 15px; color: #888; cursor: pointer; display: flex; justify-content: space-between; align-items: center;
+    }
+    .cmd-item:hover, .cmd-item.selected { background: #111; color: var(--neon-main); }
+    .cmd-key { font-size: 0.7rem; border: 1px solid #333; padding: 2px 4px; border-radius: 3px; }
+
+    /* --- Alerts --- */
+    #alert-system { position: fixed; top: 60px; right: 20px; z-index: 2000; display: flex; flex-direction: column; gap: 10px; }  
+    .terminal-alert { 
+        min-width: 300px; padding: 12px 15px; background: rgba(0,0,0,0.9); border-left: 4px solid; 
+        font-family: var(--font-stack); font-size: 0.85rem; display: flex; align-items: center; justify-content: space-between;
+        box-shadow: 5px 5px 0px rgba(0,0,0,0.5); animation: slideLeft 0.3s ease-out; opacity: 0.9;
+    }
+    .alert-error { border-color: var(--neon-red); color: var(--neon-red); }  
+    .alert-success { border-color: var(--neon-main); color: var(--neon-main); }  
+    .alert-info { border-color: var(--neon-blue); color: var(--neon-blue); }
+
+    @keyframes popIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    @keyframes slideLeft { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 0.9; } }
+
+    @media (max-width: 768px) {  
+        aside { position: absolute; height: 100%; z-index: 100; transform: translateX(-100%); width: 100%; }  
+        aside.open { transform: translateX(0); }  
+        #menu-btn { display: block !important; }  
+        #md-preview.active { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 20; }
+        .modal-box { width: 95%; }
+        #cmd-palette { width: 95%; top: 5%; }
+    } 
+    
+    /* --- Folder Styles --- */
+    .folder-container { padding: 0; border-bottom: 1px solid #111; max-height: 150px; overflow-y: auto; background: #050505; }
+    .folder-header { padding: 5px 15px; font-size: 0.7rem; color: #555; background: #0a0a0a; display: flex; justify-content: space-between; align-items: center; }
+    .folder-item { padding: 8px 15px; font-size: 0.8rem; color: #aaa; cursor: pointer; border-bottom: 1px solid #1a1a1a; display:flex; justify-content:space-between; align-items:center;}
+    .folder-item:hover { color: white; background: #111; }
+    .folder-item.active { color: var(--neon-main); background: #111; border-left: 3px solid var(--neon-main); }
+    .folder-item.trash { color: var(--neon-red); } 
+    .folder-ops { opacity: 0; transition: 0.2s; }
+    .folder-item:hover .folder-ops { opacity: 1; }
+
+    /* ═══════════════════════════════════════════
+       FACE UNLOCK STYLES
+       ═══════════════════════════════════════════ */
+    #face-layer {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: var(--bg-deep); z-index: 1000;
+        display: none; justify-content: center; align-items: center;
+    }
+
+    .face-box {
+        width: 90%; max-width: 420px; padding: 30px;
+        border: 2px solid #7c3aed;
+        background: rgba(8, 8, 10, 0.98);
+        box-shadow: 0 0 40px rgba(124,58,237,0.3);
+        text-align: center;
+    }
+
+    .face-brand {
+        display: inline-flex; align-items: center; gap: 10px;
+        margin-bottom: 4px;
+    }
+    .face-brand-icon {
+        width: 36px; height: 36px;
+        background: linear-gradient(135deg, #7c3aed, #a855f7);
+        border-radius: 10px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 18px;
+        box-shadow: 0 0 20px rgba(124,58,237,0.4);
+    }
+    .face-brand h2 {
+        font-family: 'Space Mono', monospace;
+        font-size: 20px; font-weight: 700; letter-spacing: 3px;
+        background: linear-gradient(135deg, #c084fc, #7c3aed);
+        -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        margin: 0;
+    }
+    .face-tagline {
+        font-size: 10px; color: #6b6b8a; letter-spacing: 2px;
+        text-transform: uppercase; margin-bottom: 20px;
+        font-family: 'Space Mono', monospace;
+    }
+
+    .face-cam-wrap {
+        position: relative; width: 240px; height: 240px;
+        margin: 0 auto 16px;
+    }
+    .face-cam-frame {
+        position: absolute; inset: -5px; border-radius: 16px;
+        background: conic-gradient(from 0deg, #7c3aed, #a855f7, transparent, transparent, #7c3aed);
+        animation: faceRotate 3s linear infinite;
+        opacity: 0; transition: opacity 0.3s;
+    }
+    .face-cam-frame.active { opacity: 1; }
+    @keyframes faceRotate { to { transform: rotate(360deg); } }
+
+    .face-cam-inner {
+        position: absolute; inset: 0; border-radius: 12px;
+        overflow: hidden; background: #000; z-index: 1;
+    }
+
+    #face-video {
+        width: 240px; height: 240px;
+        object-fit: cover; transform: scaleX(-1); display: block;
+    }
+    #face-canvas {
+        position: absolute; top: 0; left: 0;
+        width: 240px; height: 240px;
+        transform: scaleX(-1); pointer-events: none; z-index: 2;
+    }
+
+    .face-scan-beam {
+        position: absolute; left: 0; right: 0; height: 2px;
+        background: linear-gradient(90deg, transparent, #a855f7, transparent);
+        top: 0; animation: faceScanBeam 2s ease-in-out infinite;
+        z-index: 3; opacity: 0; transition: opacity 0.3s;
+    }
+    .face-scanning .face-scan-beam { opacity: 1; }
+    @keyframes faceScanBeam { 0%,100%{top:0;} 50%{top:100%;} }
+
+    .face-c { position: absolute; width: 18px; height: 18px; z-index: 4; }
+    .face-c-tl { top:-2px; left:-2px; border-top:2px solid #a855f7; border-left:2px solid #a855f7; border-radius:3px 0 0 0; }
+    .face-c-tr { top:-2px; right:-2px; border-top:2px solid #a855f7; border-right:2px solid #a855f7; border-radius:0 3px 0 0; }
+    .face-c-bl { bottom:-2px; left:-2px; border-bottom:2px solid #a855f7; border-left:2px solid #a855f7; border-radius:0 0 0 3px; }
+    .face-c-br { bottom:-2px; right:-2px; border-bottom:2px solid #a855f7; border-right:2px solid #a855f7; border-radius:0 0 3px 0; }
+
+    .face-status {
+        display: flex; align-items: flex-start; gap: 8px;
+        padding: 10px 12px; background: #0f0f14;
+        border: 1px solid #2a2a3a; border-radius: 8px;
+        margin-bottom: 14px; min-height: 42px; transition: all 0.3s;
+        text-align: left;
+    }
+    .face-dot { width: 7px; height: 7px; border-radius: 50%; background: #6b6b8a; flex-shrink: 0; margin-top: 4px; transition: all 0.3s; }
+    .face-status.scanning .face-dot { background: #a855f7; box-shadow: 0 0 6px #a855f7; animation: faceBlink 1s infinite; }
+    .face-status.success .face-dot { background: #10b981; box-shadow: 0 0 6px #10b981; }
+    .face-status.error .face-dot { background: #ef4444; box-shadow: 0 0 6px #ef4444; }
+    @keyframes faceBlink { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
+    .face-status-text { font-size: 12px; color: #e2e0f0; line-height: 1.5; font-family: 'Fira Code', monospace; }
+
+    .face-progress-wrap { margin-bottom: 14px; }
+    .face-progress-label { display: flex; justify-content: space-between; font-size: 10px; color: #6b6b8a; margin-bottom: 5px; font-family: 'Space Mono', monospace; }
+    .face-progress-track { height: 2px; background: #2a2a3a; border-radius: 1px; }
+    .face-progress-fill { height: 100%; border-radius: 1px; background: linear-gradient(90deg, #7c3aed, #a855f7); width: 0%; transition: width 0.3s; box-shadow: 0 0 6px #7c3aed; }
+
+    .face-btn-primary {
+        width: 100%; padding: 13px; border: none; border-radius: 10px;
+        font-family: 'Fira Code', monospace; font-size: 14px; font-weight: 600;
+        cursor: pointer; transition: all 0.25s;
+        background: linear-gradient(135deg, #7c3aed, #a855f7);
+        color: #fff; box-shadow: 0 6px 20px rgba(124,58,237,0.35);
+    }
+    .face-btn-primary:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(124,58,237,0.4); }
+    .face-btn-primary:disabled { opacity: 0.35; cursor: not-allowed; transform: none; }
+
+    .face-btn-back {
+        width: 100%; padding: 9px; margin-top: 8px;
+        background: transparent; border: 1px solid #2a2a3a; border-radius: 8px;
+        color: #6b6b8a; font-family: 'Fira Code', monospace; font-size: 12px; cursor: pointer;
+        transition: all 0.2s;
+    }
+    .face-btn-back:hover { border-color: #7c3aed; color: #a855f7; }
+
+    .face-loading {
+        position: fixed; inset: 0; background: var(--bg-deep);
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        z-index: 99999; gap: 12px;
+    }
+    .face-spinner {
+        width: 40px; height: 40px; border: 3px solid #2a2a3a;
+        border-top-color: #a855f7; border-radius: 50%;
+        animation: faceSpinAnim 0.8s linear infinite;
+    }
+    @keyframes faceSpinAnim { to { transform: rotate(360deg); } }
+    .face-loading-msg { font-family: 'Space Mono', monospace; font-size: 12px; color: #6b6b8a; letter-spacing: 2px; }
+
+    /* Face unlock success screen */
+    .face-success-screen { display: none; text-align: center; padding: 10px 0; animation: popIn 0.5s ease; }
+    .face-success-screen.show { display: block; }
+    .face-success-emoji { font-size: 48px; margin-bottom: 10px; animation: facePopIn 0.5s cubic-bezier(0.34,1.56,0.64,1); }
+    @keyframes facePopIn { from{transform:scale(0);opacity:0;} to{transform:scale(1);opacity:1;} }
+    .face-success-name { font-family: 'Space Mono', monospace; font-size: 18px; font-weight: 700; color: #10b981; margin-bottom: 3px; }
+    .face-success-sub { font-size: 12px; color: #6b6b8a; margin-bottom: 16px; font-family: 'Fira Code', monospace; }
+</style>
+
+</head>  
+<body class="crt">  
+
+<!-- LANDING -->
+<div id="landing-layer" style="position:fixed;top:0;left:0;width:100%;height:100%;background:var(--bg-deep);z-index:1000;display:flex;justify-content:center;align-items:center;">
+    <div class="login-box" style="text-align:center;">
+        <div style="font-size:2.5rem;margin-bottom:10px;">📝</div>
+        <h2 style="color:var(--neon-main);margin-bottom:5px;font-size:1.3rem;">CSM NOTEPAD V2.0</h2>
+        <p style="color:#444;font-size:0.7rem;margin-bottom:30px;letter-spacing:2px;">SECURE TERMINAL SYSTEM</p>
+        <button class="btn" onclick="showScreen('admin-layer')" style="width:100%;margin-bottom:10px;padding:12px;">🔑 ADMIN LOGIN</button>
+        <button class="btn" onclick="showScreen('user-layer')" style="width:100%;margin-bottom:10px;padding:12px;color:var(--neon-blue);border-color:#004d4d;">👤 USER ACCESS</button>
+        <button class="btn" onclick="showFaceUnlock()" style="width:100%;padding:12px;color:#a855f7;border-color:#4c1d95;background:rgba(124,58,237,0.05);">👁 FACE UNLOCK</button>
+    </div>
+</div>
+
+<!-- ADMIN LOGIN -->
+<div id="admin-layer" style="position:fixed;top:0;left:0;width:100%;height:100%;background:var(--bg-deep);z-index:1000;display:none;justify-content:center;align-items:center;">
+    <div class="login-box">
+        <div style="font-size:2rem;text-align:center;margin-bottom:8px;">🔐</div>
+        <h2 style="color:var(--neon-main);text-align:center;font-size:1.1rem;margin-bottom:5px;">:: ADMIN LOGIN ::</h2>
+        <p style="color:#444;font-size:0.7rem;margin-bottom:20px;text-align:center;">EMAIL + PASSWORD</p>
+        <input type="email" id="email" class="login-input" placeholder="EMAIL">
+        <input type="password" id="pass" class="login-input" placeholder="PASSWORD" onkeydown="if(event.key==='Enter')doAdminLogin()">
+        <div id="admin-err" style="display:none;color:var(--neon-red);font-size:0.75rem;margin:8px 0;padding:8px;border:1px solid #500;background:rgba(255,0,60,0.05);"></div>
+        <button class="btn" id="admin-btn" onclick="doAdminLogin()" style="width:100%;margin-top:15px;padding:12px;">LOGIN →</button>
+        <p onclick="resetPass()" style="margin-top:10px;font-size:0.7rem;cursor:pointer;text-decoration:underline;opacity:0.5;color:#aaa;text-align:center;">FORGOT PASSWORD?</p>
+        <div style="text-align:center;margin-top:12px;"><span onclick="showScreen('landing-layer')" style="color:var(--neon-blue);font-size:0.75rem;cursor:pointer;">← BACK</span></div>
+    </div>
+</div>
+
+<!-- USER ACCESS -->
+<div id="user-layer" style="position:fixed;top:0;left:0;width:100%;height:100%;background:var(--bg-deep);z-index:1000;display:none;justify-content:center;align-items:center;">
+    <div class="login-box">
+        <div style="font-size:2rem;text-align:center;margin-bottom:8px;">🔓</div>
+        <h2 style="color:var(--neon-main);text-align:center;font-size:1.1rem;margin-bottom:5px;">:: USER ACCESS ::</h2>
+        <p style="color:#444;font-size:0.7rem;margin-bottom:20px;text-align:center;">ENTER PASSCODE</p>
+        <input type="password" id="user-pass" class="login-input" placeholder="PASSCODE" maxlength="30" onkeydown="if(event.key==='Enter')doUserLogin()">
+        <div id="user-err" style="display:none;color:var(--neon-red);font-size:0.75rem;margin:8px 0;padding:8px;border:1px solid #500;background:rgba(255,0,60,0.05);"></div>
+        <button class="btn btn-info" id="user-btn" onclick="doUserLogin()" style="width:100%;margin-top:15px;padding:12px;">ACCESS NOTEPAD →</button>
+        <div style="text-align:center;margin-top:12px;"><span onclick="showScreen('landing-layer')" style="color:var(--neon-blue);font-size:0.75rem;cursor:pointer;">← BACK</span></div>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     FACE UNLOCK LAYER  
+     ═══════════════════════════════════════ -->
+<div id="face-layer">
+    <!-- Loading screen -->
+    <div class="face-loading" id="face-loading">
+        <div class="face-spinner"></div>
+        <div class="face-loading-msg" id="face-loading-msg">MODEL LOADING...</div>
+    </div>
+
+    <div class="face-box" id="face-box" style="display:none;">
+        <!-- Brand -->
+        <div class="face-brand">
+            <div class="face-brand-icon">👁</div>
+            <h2>FACELOCK</h2>
+        </div>
+        <div class="face-tagline">Face Authentication · CSM Notepad</div>
+
+        <!-- Success screen -->
+        <div class="face-success-screen" id="face-success-screen">
+            <div class="face-success-emoji">🔓</div>
+            <div class="face-success-name" id="face-success-name">স্বাগতম!</div>
+            <div class="face-success-sub" id="face-success-sub">পরিচয় নিশ্চিত হয়েছে</div>
+        </div>
+
+        <!-- Login controls -->
+        <div id="face-login-controls">
+            <div class="face-cam-wrap" id="face-cam-wrap">
+                <div class="face-cam-frame" id="face-cam-frame"></div>
+                <div class="face-cam-inner">
+                    <video id="face-video" autoplay muted playsinline></video>
+                    <canvas id="face-canvas"></canvas>
+                    <div class="face-scan-beam"></div>
+                </div>
+                <div class="face-c face-c-tl"></div>
+                <div class="face-c face-c-tr"></div>
+                <div class="face-c face-c-bl"></div>
+                <div class="face-c face-c-br"></div>
+            </div>
+
+            <div class="face-status" id="face-status-bar">
+                <div class="face-dot"></div>
+                <div class="face-status-text" id="face-status-text">মুখ ক্যামেরার দিকে রাখুন।</div>
+            </div>
+
+            <div class="face-progress-wrap" id="face-prog-wrap" style="display:none;">
+                <div class="face-progress-label"><span>SCANNING</span><span id="face-prog-pct">0%</span></div>
+                <div class="face-progress-track"><div class="face-progress-fill" id="face-prog-fill"></div></div>
+            </div>
+
+            <button class="face-btn-primary" id="face-scan-btn" onclick="doFaceScan()" disabled>
+                👁 মুখ দিয়ে লগইন করুন
+            </button>
+        </div>
+
+        <button class="face-btn-back" onclick="hideFaceUnlock()">← BACK TO MENU</button>
+    </div>
+</div>
+
+<!-- AUTH LAYER (kept for compat) -->
+<div id="auth-layer" style="display:none;"></div>  
+
+<!-- MODAL SYSTEM -->
+<div id="modal-overlay" tabindex="-1">
+    <div class="modal-box" id="modal-box" role="dialog" aria-modal="true">
+        <div class="modal-header" id="modal-title">TITLE</div>
+        <div class="modal-body" id="modal-body">Content</div>
+        <div class="modal-actions" id="modal-actions"></div>
+    </div>
+</div>
+
+<!-- COMMAND PALETTE -->
+<div id="cmd-palette">
+    <input type="text" id="cmd-input" placeholder="> Type a command..." autocomplete="off">
+    <div id="cmd-list"></div>
+</div>
+
+<!-- APP LAYER -->
+<div id="app-layer">  
+    <header>  
+        <div style="display: flex; align-items: center; gap: 15px;">  
+            <button class="btn" onclick="toggleSidebar()" id="menu-btn" style="display:none;">≡</button>  
+            <div style="font-weight:600;"><i class="fas fa-terminal"></i>CSM MOHASIN NOTEPAD V2.0</div>  
+        </div>  
+        <div style="display:flex; align-items:center;">  
+            <button class="btn btn-info" onclick="toggleMarkdown()" title="Split Preview"><i class="fas fa-columns"></i> MD</button>
+            <button class="btn" onclick="toggleCommandPalette()" title="Command Palette (Ctrl+Shift+P)"><i class="fas fa-terminal"></i></button>
+            <button class="btn" id="passcode-mgr-btn" onclick="openPasscodeManager()" title="Passcode Management" style="display:none;color:var(--neon-yellow);border-color:#554400;"><i class="fas fa-key"></i></button>
+            <button class="btn" onclick="openSettings()" title="Themes & Settings"><i class="fas fa-cog"></i></button>
+            <button class="btn" onclick="openExportMenu()" title="Export"><i class="fas fa-file-export"></i></button>
+            <button class="btn" onclick="showShortcuts()" title="Keyboard Shortcuts (Ctrl+/)"><i class="fas fa-keyboard"></i></button>
+            
+            <span style="width:1px; height:20px; background:#333; margin:0 10px;"></span>
+            
+            <button class="btn" onclick="createNewNote()" title="New (Ctrl+N)">+ NEW</button>  
+            <button class="btn" onclick="toggleFullScreen()"><i class="fas fa-expand"></i></button>
+            <button class="btn btn-danger" onclick="confirmLogout()"><i class="fas fa-power-off"></i></button>  
+        </div>  
+    </header>  
+
+    <div class="workspace">  
+        <aside id="sidebar">  
+            <div id="user-display" class="user-info">
+                <span>USER: GUEST</span>
+                <i class="fas fa-circle" style="color:var(--neon-main); font-size:0.5rem; align-self:center;"></i>
+            </div>
+            
+            <div class="folder-header">
+                <span>DIRECTORIES</span>
+                <i class="fas fa-plus" style="cursor:pointer;" onclick="createFolder()" title="Add Folder"></i>
+            </div>
+            <div id="folder-list" class="folder-container"></div>
+            
+            <div class="search-container">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" id="search-bar" class="search-bar" placeholder="SEARCH (Ctrl+F)">
+                <button class="btn" onclick="toggleSelectionMode()" id="select-toggle-btn" title="Toggle Selection Mode"><i class="fas fa-check-square"></i></button>
+            </div>
+            
+            <div class="tag-cloud" id="tag-cloud"></div>
+            
+            <div class="notes-list" id="notes-list"></div> 
+            
+            <div id="bulk-toolbar">
+                <div style="font-size:0.7rem; color:#888; text-align:center;">SELECTED: <span id="sel-count">0</span></div>
+                <div id="bulk-btns" style="display:flex; gap:5px; flex-direction:column;"></div>
+            </div>
+
+            <div style="padding:5px 15px; font-size:0.6rem; border-bottom:1px solid #222;" id="status-line">STATUS: CHECKING...</div>  
+        </aside>  
+        
+        <main>  
+            <div class="editor-toolbar">
+                <button class="btn" onclick="togglePin()" title="Pin Note" id="pin-btn" style="border:none;"><i class="far fa-star"></i></button>
+                <input type="text" id="doc-title" placeholder="UNTITLED_DOC">
+                <span id="date-display"></span>
+                <div style="font-size: 0.8rem; color: #555;">
+                    <button class="btn" onclick="openMoveMenu()" title="Move to Folder"><i class="fas fa-folder"></i></button>
+                    <button class="btn" onclick="editorUndo()" title="Undo (Ctrl+Z)"><i class="fas fa-undo"></i></button>
+                    <button class="btn" onclick="editorRedo()" title="Redo (Ctrl+Y)"><i class="fas fa-redo"></i></button>
+                    <button class="btn" onclick="openVersionHistory()" title="Snapshots"><i class="fas fa-history"></i></button>
+                    <button class="btn btn-info" onclick="generateShareLink()" title="Share Link"><i class="fas fa-link"></i></button>
+                </div>
+            </div>
+
+            <div class="split-view">
+                <textarea id="doc-body" placeholder="Start typing... Supports Markdown (# H1, **bold**, - list)"></textarea>  
+                <div id="md-preview"></div>
+            </div>
+            
+            <input type="hidden" id="current-id">  
+            <input type="hidden" id="is-pinned" value="false">
+            <input type="hidden" id="current-folder-ref" value="INBOX">
+        </main>  
+    </div>  
+
+    <div class="status-bar">  
+        <div style="display:flex; gap:15px; align-items:center;">
+            <span id="save-indicator">[READY]</span>  
+            <span id="word-count" style="color: #666;">WORDS: 0</span>
+        </div>
+        <div style="display:flex; align-items:center; gap:10px;">
+            <div id="trash-ops" style="display:none; gap:5px;">
+                <button class="btn btn-info" style="padding:0 8px; font-size:0.7rem; height:20px;" onclick="restoreNote()">RESTORE</button>
+                <button class="btn btn-danger" style="padding:0 8px; font-size:0.7rem; height:20px;" onclick="permanentDelete()">DEL PERMANENT</button>
+            </div>
+            <button class="btn btn-danger" style="padding: 0 10px; font-size: 0.7rem; height: 20px; display: none;" id="del-btn" onclick="moveToTrash()">DEL</button>
+            <span id="clock-display">00:00:00</span>  
+        </div>
+    </div>  
+</div>  
+
+<div id="alert-system"></div>  
+<input type="file" id="restore-input" style="display:none;" onchange="importDatabaseFile(this)">
+
+<!-- face-api.js (local) -->
+<script src="./face-api.min.js" onerror="window._faceApiNeedCDN=true"></script>
+
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>  
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>  
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>  
+
+<script>  
+    // ═══════════════════════════════════════════════════════
+    // NOTE APP AUTH SYSTEM (unchanged)
+    // ═══════════════════════════════════════════════════════
+    const MASTER = 'samiya';
+    let _isMaster = false, _isUser = false;
+
+    function showScreen(id) {
+        ['landing-layer','admin-layer','user-layer'].forEach(s => {
+            const el = document.getElementById(s);
+            if (el) el.style.display = 'none';
+        });
+        const target = document.getElementById(id);
+        if (target) target.style.display = 'flex';
+        ['admin-err','user-err'].forEach(e => {
+            const el = document.getElementById(e);
+            if (el) el.style.display = 'none';
+        });
+    }
+
+    function doAdminLogin() {
+        const email = document.getElementById('email').value.trim();
+        const pass = document.getElementById('pass').value;
+        const err = document.getElementById('admin-err');
+        const btn = document.getElementById('admin-btn');
+        if (!email || !pass) { err.textContent = '⛔ Fill all fields!'; err.style.display = 'block'; return; }
+        btn.disabled = true; btn.innerText = 'CONNECTING...'; err.style.display = 'none';
+        auth.signInWithEmailAndPassword(email, pass)
+            .catch(e => { err.textContent = '⛔ ' + e.message; err.style.display = 'block'; btn.disabled = false; btn.innerText = 'LOGIN →'; });
+    }
+
+    async function doUserLogin() {
+        const input = document.getElementById('user-pass').value.trim();
+        const err = document.getElementById('user-err');
+        const btn = document.getElementById('user-btn');
+        if (!input) { err.textContent = '⛔ Enter passcode!'; err.style.display = 'block'; return; }
+        btn.disabled = true; btn.innerText = 'CHECKING...'; err.style.display = 'none';
+
+        try {
+            const authTimeout = new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 3000));
+            await Promise.race([auth.signInAnonymously(), authTimeout]);
+        } catch(e) {}
+
+        if (input === MASTER) {
+            try {
+                const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 3000));
+                const mSnap = await Promise.race([db.ref('config/master').once('value'), timeoutPromise]);
+                if (mSnap.exists() && mSnap.val().enabled === false) {
+                    err.textContent = '⛔ Master passcode disabled!';
+                    err.style.display = 'block'; btn.disabled = false; btn.innerText = 'ACCESS NOTEPAD →'; return;
+                }
+            } catch(e) {}
+            document.getElementById('user-pass').value = '';
+            btn.disabled = false; btn.innerText = 'ACCESS NOTEPAD →';
+            _isMaster = true; _isUser = true;
+            await launchApp('MASTER ACCESS', false);
+            return;
+        }
+
+        try {
+            const t2 = new Promise((_, reject) => setTimeout(() => reject(new Error('No internet connection. অনলাইনে থেকে চেষ্টা করুন।')), 5000));
+            const snap = await Promise.race([db.ref('passcodes').once('value'), t2]);
+            const codes = snap.val() || {};
+            const now = new Date();
+            let matched = null, errMsg = '';
+            for (const [id, pc] of Object.entries(codes)) {
+                if (pc.code !== input) continue;
+                if (!pc.enabled) { errMsg = 'Passcode disabled!'; break; }
+                if (pc.expiry && new Date(pc.expiry) < now) { errMsg = 'Passcode expired!'; break; }
+                const used = pc.usedCount || 0, limit = pc.limit || 0;
+                if (limit > 0 && used >= limit) { errMsg = 'Passcode limit reached!'; break; }
+                matched = { id, ...pc }; break;
+            }
+            if (!matched) {
+                err.textContent = '⛔ ' + (errMsg || 'Wrong passcode!');
+                err.style.display = 'block'; btn.disabled = false; btn.innerText = 'ACCESS NOTEPAD →'; return;
+            }
+            try {
+                const updateData = { usedCount: (matched.usedCount || 0) + 1 };
+                if (matched.oneTime) updateData.enabled = false;
+                await db.ref('passcodes/' + matched.id).update(updateData);
+            } catch(e) {
+                err.textContent = '⛔ ACCESS FAILED: Firebase permission error.';
+                err.style.display = 'block'; btn.disabled = false; btn.innerText = 'ACCESS NOTEPAD →';
+                return;
+            }
+            document.getElementById('user-pass').value = '';
+            btn.disabled = false; btn.innerText = 'ACCESS NOTEPAD →';
+            _isUser = true; _isMaster = false;
+            await launchApp('USER: ' + (matched.label||'USER').toUpperCase(), true);
+        } catch(e) {
+            err.textContent = '⛔ Error: ' + e.message;
+            err.style.display = 'block'; btn.disabled = false; btn.innerText = 'ACCESS NOTEPAD →';
+        }
+    }
+
+    let _readOnly = false;
+
+    async function launchApp(label, readOnly) {
+        try { await auth.signInAnonymously(); } catch(e) {}
+        currentUser = 'shared';
+        _readOnly = readOnly || false;
+        showApp(label, true);
+    }
+
+    function showApp(label, isPasscodeUser) {
+        currentUser = 'shared';
+        ['landing-layer','admin-layer','user-layer','face-layer'].forEach(s => {
+            const el = document.getElementById(s);
+            if (el) el.style.display = 'none';
+        });
+        document.getElementById('app-layer').style.display = 'flex';
+        const roTag = _readOnly ? ' <span style="font-size:0.65rem;background:rgba(255,0,60,0.15);color:var(--neon-red);border:1px solid #500;padding:1px 6px;border-radius:3px;">READ ONLY</span>' : '';
+        document.getElementById('user-display').innerHTML =
+            '<span>' + label + roTag + '</span> <i class="fas fa-wifi" style="color:' + (isPasscodeUser ? 'var(--neon-blue)' : 'var(--neon-main)') + ';"></i>';
+        const pcBtn = document.getElementById('passcode-mgr-btn');
+        if (pcBtn) pcBtn.style.display = _readOnly ? 'none' : 'inline-block';
+        if (_readOnly) {
+            document.getElementById('doc-body').setAttribute('readonly', true);
+            document.getElementById('doc-title').setAttribute('readonly', true);
+            document.getElementById('del-btn').style.display = 'none';
+        }
+        checkConnection();
+        loadNotes();
+        clearEditor(true);
+        logActivity('ACCESS: ' + label + (_readOnly ? ' [READ ONLY]' : ''), 'success');
+    }
+
+    // ═══════════════════════════════════════════════════════
+    // FACE UNLOCK SYSTEM
+    // ═══════════════════════════════════════════════════════
+
+    // Face unlock এর জন্য আলাদা Firebase config (facelock website এর)
+    const FACE_FIREBASE_CONFIG = {
+        apiKey: "AIzaSyB8rID7RGFq4iLkueeJsoYYyJ_aAh7qBHs",
+        authDomain: "voice-call-demo-1201b.firebaseapp.com",
+        projectId: "voice-call-demo-1201b",
+        storageBucket: "voice-call-demo-1201b.firebasestorage.app",
+        messagingSenderId: "611354192250",
+        appId: "1:611354192250:web:bac02535d65ca6565fcec3"
+    };
+
+    const FACE_MODEL_URL = './models';
+    const FACE_MODEL_CDN = 'https://cdn.jsdelivr.net/gh/justadudewhohacks/face-api.js/weights';
+    const FACE_THRESHOLD = 0.48;
+
+    let _faceState = 'idle'; // idle | scanning | matched | failed
+    let _faceStream = null;
+    let _facePreviewRunning = false;
+    let _faceDb = null;
+    let _faceModelsLoaded = false;
+
+    async function initFaceFirebase() {
+        if (_faceDb) return _faceDb;
+        try {
+            // আলাদা Firebase app instance (নাম দিয়ে যাতে conflict না হয়)
+            let faceApp;
+            try {
+                faceApp = firebase.app('facelock');
+            } catch(e) {
+                faceApp = firebase.initializeApp(FACE_FIREBASE_CONFIG, 'facelock');
+            }
+            _faceDb = faceApp.firestore ? null : null; // firestore v9 এ আলাদা
+            return faceApp;
+        } catch(e) {
+            console.error('Face Firebase init error:', e);
+            return null;
+        }
+    }
+
+    async function loadFaceUsers() {
+        // Firestore v9 modular API ব্যবহার করছি dynamically
+        const { initializeApp, getApps } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
+        const { getFirestore, collection, getDocs, enableIndexedDbPersistence } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+
+        let faceFirestoreApp;
+        const existingApps = getApps();
+        const existing = existingApps.find(a => a.name === 'facelock-v9');
+        if (existing) {
+            faceFirestoreApp = existing;
+        } else {
+            faceFirestoreApp = initializeApp(FACE_FIREBASE_CONFIG, 'facelock-v9');
+        }
+
+        const firestoreDb = getFirestore(faceFirestoreApp);
+        try { await enableIndexedDbPersistence(firestoreDb); } catch(e) {}
+
+        const snap = await getDocs(collection(firestoreDb, 'facelock_users'));
+        return snap.docs.map(d => ({
+            name: d.data().name,
+            descriptor: new Float32Array(d.data().descriptor)
+        }));
+    }
+
+    function setFaceStatus(type, msg) {
+        const sb = document.getElementById('face-status-bar');
+        const st = document.getElementById('face-status-text');
+        sb.className = 'face-status ' + (type !== 'idle' ? type : '');
+        st.textContent = msg;
+        const wrap = document.getElementById('face-cam-wrap');
+        const frame = document.getElementById('face-cam-frame');
+        wrap.className = 'face-cam-wrap' + (type === 'scanning' ? ' face-scanning' : '');
+        frame.className = 'face-cam-frame' + (type === 'scanning' ? ' active' : '');
+    }
+
+    async function showFaceUnlock() {
+        // সব অন্য layer লুকাও
+        ['landing-layer','admin-layer','user-layer'].forEach(s => {
+            const el = document.getElementById(s);
+            if (el) el.style.display = 'none';
+        });
+
+        const faceLayer = document.getElementById('face-layer');
+        const faceBox = document.getElementById('face-box');
+        const faceLoading = document.getElementById('face-loading');
+
+        faceLayer.style.display = 'flex';
+        faceLoading.style.display = 'flex';
+        faceBox.style.display = 'none';
+
+        try {
+            // face-api.js load
+            if (window._faceApiNeedCDN || typeof faceapi === 'undefined') {
+                document.getElementById('face-loading-msg').textContent = 'CDN থেকে লোড হচ্ছে...';
+                await new Promise((res, rej) => {
+                    const s = document.createElement('script');
+                    s.src = 'https://cdn.jsdelivr.net/npm/face-api.js/dist/face-api.min.js';
+                    s.onload = res; s.onerror = rej;
+                    document.head.appendChild(s);
+                });
+            }
+
+            if (!_faceModelsLoaded) {
+                document.getElementById('face-loading-msg').textContent = 'DETECTOR LOADING...';
+                // প্রথমে local models চেষ্টা, fail হলে CDN
+                try {
+                    await faceapi.nets.tinyFaceDetector.loadFromUri(FACE_MODEL_URL);
+                    await faceapi.nets.faceLandmark68TinyNet.loadFromUri(FACE_MODEL_URL);
+                    document.getElementById('face-loading-msg').textContent = 'RECOGNITION LOADING...';
+                    await faceapi.nets.faceRecognitionNet.loadFromUri(FACE_MODEL_URL);
+                } catch(e) {
+                    // Local models না থাকলে CDN থেকে load
+                    document.getElementById('face-loading-msg').textContent = 'CDN MODELS...';
+                    await faceapi.nets.tinyFaceDetector.loadFromUri(FACE_MODEL_CDN);
+                    await faceapi.nets.faceLandmark68TinyNet.loadFromUri(FACE_MODEL_CDN);
+                    await faceapi.nets.faceRecognitionNet.loadFromUri(FACE_MODEL_CDN);
+                }
+                _faceModelsLoaded = true;
+            }
+
+            document.getElementById('face-loading-msg').textContent = 'CAMERA...';
+
+            _faceStream = await navigator.mediaDevices.getUserMedia({
+                video: { facingMode: 'user', width: { ideal: 240 }, height: { ideal: 240 } }
+            });
+
+            const video = document.getElementById('face-video');
+            video.srcObject = _faceStream;
+            await video.play();
+
+            faceLoading.style.display = 'none';
+            faceBox.style.display = 'block';
+
+            setFaceStatus('idle', '✅ ক্যামেরা প্রস্তুত। লগইন করতে বোতাম চাপুন।');
+            document.getElementById('face-scan-btn').disabled = false;
+
+            // Canvas setup
+            const canvas = document.getElementById('face-canvas');
+            canvas.width = 240; canvas.height = 240;
+
+            _faceState = 'idle';
+            if (!_facePreviewRunning) {
+                _facePreviewRunning = true;
+                facePreviewLoop();
+            }
+
+        } catch(e) {
+            document.getElementById('face-loading-msg').textContent = '❌ ' + e.message;
+            document.getElementById('face-loading-msg').style.color = '#ef4444';
+            setTimeout(() => hideFaceUnlock(), 3000);
+        }
+    }
+
+    function hideFaceUnlock() {
+        // Camera বন্ধ করো
+        if (_faceStream) {
+            _faceStream.getTracks().forEach(t => t.stop());
+            _faceStream = null;
+        }
+        _facePreviewRunning = false;
+        _faceState = 'idle';
+
+        // Reset UI
+        document.getElementById('face-success-screen').classList.remove('show');
+        document.getElementById('face-login-controls').style.display = 'block';
+        document.getElementById('face-scan-btn').disabled = true;
+        document.getElementById('face-prog-wrap').style.display = 'none';
+        document.getElementById('face-canvas').getContext('2d').clearRect(0,0,240,240);
+        document.getElementById('face-layer').style.display = 'none';
+
+        showScreen('landing-layer');
+    }
+
+    window.doFaceScan = async function() {
+        const btn = document.getElementById('face-scan-btn');
+        btn.disabled = true;
+        _faceState = 'scanning';
+        setFaceStatus('scanning', '☁️ Firebase থেকে ব্যবহারকারী লোড করছি...');
+
+        let users;
+        try {
+            users = await loadFaceUsers();
+        } catch(e) {
+            setFaceStatus('error', '❌ Firebase থেকে ডেটা আনা যায়নি: ' + e.message);
+            btn.disabled = false; _faceState = 'idle'; return;
+        }
+
+        if (!users.length) {
+            setFaceStatus('error', '❌ কোনো নিবন্ধিত ব্যবহারকারী নেই।');
+            btn.disabled = false; _faceState = 'idle'; return;
+        }
+
+        setFaceStatus('scanning', `🔍 ${users.length} জন ব্যবহারকারীর সাথে মিলিয়ে দেখছি...`);
+        document.getElementById('face-prog-wrap').style.display = 'block';
+
+        const video = document.getElementById('face-video');
+        const canvas = document.getElementById('face-canvas');
+        canvas.width = 240; canvas.height = 240;
+
+        const opts = new faceapi.TinyFaceDetectorOptions({ inputSize: 160, scoreThreshold: 0.4 });
+        const labeled = users.map(u => new faceapi.LabeledFaceDescriptors(u.name, [u.descriptor]));
+        const matcher = new faceapi.FaceMatcher(labeled, FACE_THRESHOLD);
+
+        let found = false, tries = 0;
+
+        while (!found && tries < 25) {
+            tries++;
+            const pct = Math.round((tries / 25) * 100);
+            document.getElementById('face-prog-fill').style.width = pct + '%';
+            document.getElementById('face-prog-pct').textContent = pct + '%';
+            await new Promise(r => setTimeout(r, 120));
+
+            const result = await faceapi.detectSingleFace(video, opts).withFaceLandmarks(true).withFaceDescriptor();
+
+            if (!result) {
+                setFaceStatus('scanning', `⏳ মুখ খুঁজছি... (${tries}/25)`);
+                continue;
+            }
+
+            const match = matcher.findBestMatch(result.descriptor);
+            const isMatch = match.label !== 'unknown';
+
+            if (isMatch) {
+                found = true;
+                _faceState = 'matched';
+                await faceScanSuccess(match.label, match.distance);
+            } else {
+                setFaceStatus('scanning', `🔄 মিলছে না (${match.distance.toFixed(2)}) — চেষ্টা চলছে...`);
+            }
+        }
+
+        if (!found) {
+            _faceState = 'failed';
+            setFaceStatus('error', '❌ কোনো নিবন্ধিত ব্যবহারকারীর সাথে মুখ মিলছে না।');
+            document.getElementById('face-prog-wrap').style.display = 'none';
+            btn.disabled = false;
+            setTimeout(() => { _faceState = 'idle'; }, 2500);
+        }
+    };
+
+    async function faceScanSuccess(name, distance) {
+        // Canvas clear
+        const canvas = document.getElementById('face-canvas');
+        canvas.getContext('2d').clearRect(0, 0, 240, 240);
+
+        // Success screen দেখাও
+        document.getElementById('face-login-controls').style.display = 'none';
+        const successScreen = document.getElementById('face-success-screen');
+        successScreen.classList.add('show');
+        document.getElementById('face-success-name').textContent = `স্বাগতম, ${name}!`;
+        document.getElementById('face-success-sub').textContent = `পরিচয় নিশ্চিত (accuracy: ${((1 - distance) * 100).toFixed(1)}%)`;
+
+        setFaceStatus('success', `✅ ${name} — প্রবেশাধিকার দেওয়া হয়েছে`);
+
+        // Camera বন্ধ করো
+        if (_faceStream) {
+            _faceStream.getTracks().forEach(t => t.stop());
+            _faceStream = null;
+        }
+        _facePreviewRunning = false;
+
+        // 1.8 সেকেন্ড পরে note app এ প্রবেশ
+        setTimeout(() => {
+            document.getElementById('face-layer').style.display = 'none';
+            // Face unlock = Admin authority
+            _isMaster = false; _isUser = false;
+            _readOnly = false;
+            currentUser = 'shared';
+            try { auth.signInAnonymously(); } catch(e) {}
+            showApp('FACE: ' + name.toUpperCase(), false);
+            logActivity('FACE UNLOCK: ' + name.toUpperCase(), 'success');
+        }, 1800);
+    }
+
+    async function facePreviewLoop() {
+        const video = document.getElementById('face-video');
+        const canvas = document.getElementById('face-canvas');
+        const opts = new faceapi.TinyFaceDetectorOptions({ inputSize: 160, scoreThreshold: 0.4 });
+
+        while (_facePreviewRunning) {
+            await new Promise(r => setTimeout(r, 100));
+            if (!_facePreviewRunning) break;
+            if (!video.srcObject) break;
+
+            try {
+                const res = await faceapi.detectSingleFace(video, opts).withFaceLandmarks(true);
+                const ctx = canvas.getContext('2d');
+                ctx.clearRect(0, 0, 240, 240);
+                if (!res) continue;
+
+                const state = _faceState;
+                const c = state === 'matched'  ? '#10b981'
+                        : state === 'scanning' ? '#00d4ff'
+                        : state === 'failed'   ? '#ef4444'
+                        : '#a855f7';
+
+                const glowSize = state === 'scanning' ? 14 : state === 'matched' ? 18 : 7;
+                const pts = res.landmarks.positions;
+                const flip = p => ({ x: 240 - p.x, y: p.y });
+                const b = res.detection.box;
+                const bx = 240 - b.x - b.width, by = b.y, bw = b.width, bh = b.height;
+                const cs = 12;
+
+                // Corner brackets
+                ctx.strokeStyle = c; ctx.lineWidth = 2.5;
+                ctx.shadowColor = c; ctx.shadowBlur = glowSize;
+                ctx.beginPath(); ctx.moveTo(bx,by+cs); ctx.lineTo(bx,by); ctx.lineTo(bx+cs,by); ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(bx+bw-cs,by); ctx.lineTo(bx+bw,by); ctx.lineTo(bx+bw,by+cs); ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(bx,by+bh-cs); ctx.lineTo(bx,by+bh); ctx.lineTo(bx+cs,by+bh); ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(bx+bw-cs,by+bh); ctx.lineTo(bx+bw,by+bh); ctx.lineTo(bx+bw,by+bh-cs); ctx.stroke();
+                ctx.shadowBlur = 0;
+
+                // Landmark mesh
+                const alpha = state === 'scanning' ? 0.7 : state === 'matched' ? 0.9 : 0.45;
+                ctx.strokeStyle = c; ctx.globalAlpha = alpha;
+                ctx.lineWidth = 0.8; ctx.shadowColor = c; ctx.shadowBlur = state === 'scanning' ? 5 : state === 'matched' ? 7 : 2;
+
+                const drawLine = (arr, close = false) => {
+                    ctx.beginPath();
+                    arr.forEach((i, idx) => { const p = flip(pts[i]); idx === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y); });
+                    if (close) { const p = flip(pts[arr[0]]); ctx.lineTo(p.x, p.y); }
+                    ctx.stroke();
+                };
+
+                drawLine([0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16]);
+                drawLine([17,18,19,20,21]); drawLine([22,23,24,25,26]);
+                drawLine([36,37,38,39,40,41], true); drawLine([42,43,44,45,46,47], true);
+                drawLine([27,28,29,30]); drawLine([31,32,33,34,35]);
+                drawLine([48,49,50,51,52,53,54,55,56,57,58,59], true);
+
+                ctx.lineWidth = 0.5;
+                [[0,17],[17,36],[36,0],[16,26],[26,45],[45,16],[27,21],[27,22],[30,48],[30,54],[8,57],[33,51],[21,39],[22,42]].forEach(([a,b2]) => {
+                    const pa = flip(pts[a]), pb = flip(pts[b2]);
+                    ctx.beginPath(); ctx.moveTo(pa.x, pa.y); ctx.lineTo(pb.x, pb.y); ctx.stroke();
+                });
+
+                ctx.shadowBlur = 0; ctx.globalAlpha = 1;
+
+                // Dots
+                ctx.fillStyle = c; ctx.shadowColor = c; ctx.shadowBlur = state === 'scanning' ? 5 : state === 'matched' ? 7 : 2;
+                pts.forEach(pt => { const p = flip(pt); ctx.beginPath(); ctx.arc(p.x, p.y, 1.4, 0, Math.PI * 2); ctx.fill(); });
+                ctx.shadowBlur = 0;
+
+            } catch(e) { /* preview loop error ignore */ }
+        }
+    }
+
+    // ═══════════════════════════════════════════════════════
+    // NOTE APP CORE (unchanged from original)
+    // ═══════════════════════════════════════════════════════
+    function setVh() {
+        let vh = window.innerHeight * 0.01;
+        document.documentElement.style.setProperty('--vh', `${vh}px`);
+    }
+    window.addEventListener('resize', setVh);
+    setVh();
+    
+    const firebaseConfig = {  
+        apiKey: "AIzaSyCJDYv3qR88OcpR5Jfm_rMd8z9WZPYqWjw",  
+        authDomain: "notepad-c5b98.firebaseapp.com",  
+        databaseURL: "https://notepad-c5b98-default-rtdb.firebaseio.com",  
+        projectId: "notepad-c5b98",  
+        storageBucket: "notepad-c5b98.firebasestorage.app",  
+        messagingSenderId: "737040022800",  
+        appId: "1:737040022800:web:5e5eb1971ccadf6d753995"  
+    };  
+    firebase.initializeApp(firebaseConfig);  
+    const auth = firebase.auth();  
+    const db = firebase.database();  
+
+    let currentUser = null;  
+    let autoSaveTimer;  
+    let currentTags = new Set();
+    let filterTag = null;
+    let activeFolder = 'INBOX';
+    let knownFolders = new Set(['INBOX']);
+    let trashUnlocked = false; 
+    let isSelectionMode = false;
+    let selectedNotes = new Set();
+
+    class SimpleHistory {
+        constructor() { this.stack = []; this.index = -1; this.max = 20; }
+        push(state) {
+            if (this.index < this.stack.length - 1) this.stack = this.stack.slice(0, this.index + 1);
+            this.stack.push(state);
+            if (this.stack.length > this.max) this.stack.shift();
+            else this.index++;
+        }
+        undo() { if (this.index > 0) return this.stack[--this.index]; return null; }
+        redo() { if (this.index < this.stack.length - 1) return this.stack[++this.index]; return null; }
+        current() { return this.stack[this.index]; }
+        reset() { this.stack = []; this.index = -1; }
+    }
+    const noteHistory = new SimpleHistory();
+    const CACHE_KEY_PREFIX = 'ghost_cache_';
+    const QUEUE_KEY_PREFIX = 'ghost_queue_';
+
+    async function sha256(message) {
+        if (!message) return null;
+        const msgBuffer = new TextEncoder().encode(message);
+        const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+
+    function logActivity(msg, type = 'info') {
+        const container = document.getElementById('alert-system');
+        const box = document.createElement('div');
+        box.className = `terminal-alert alert-${type}`;
+        let icon = 'fa-info-circle';
+        if(type === 'success') icon = 'fa-check';
+        if(type === 'error') icon = 'fa-times-circle';
+        const time = new Date().toLocaleTimeString([], { hour12: false });
+        box.innerHTML = `
+            <div style="display:flex;align-items:center;gap:10px;">
+                <i class="fas ${icon}"></i> <span>${msg.toUpperCase()}</span>
+            </div>
+            <span style="font-size:0.7rem; color:#555">[${time}]</span>
+        `;
+        container.appendChild(box);
+        setTimeout(() => {
+            box.style.opacity = '0';
+            box.style.transform = 'translateX(100%)';
+            setTimeout(() => box.remove(), 300);
+        }, 3500);
+    }
+
+    const SystemUI = {
+        overlay: document.getElementById('modal-overlay'),
+        box: document.getElementById('modal-box'),
+        title: document.getElementById('modal-title'),
+        body: document.getElementById('modal-body'),
+        actions: document.getElementById('modal-actions'),
+        resolvePromise: null,
+        reset: function() {
+            this.overlay.style.display = 'none';
+            this.title.innerHTML = '';
+            this.body.innerHTML = '';
+            this.actions.innerHTML = '';
+            this.resolvePromise = null;
+        },
+        show: function(title, contentHtml, buttonsHtml = null) {
+            this.title.innerHTML = title;
+            this.body.innerHTML = contentHtml;
+            if(!buttonsHtml) {
+                this.actions.innerHTML = `<button class="btn" onclick="SystemUI.close()">CLOSE</button>`;
+            } else {
+                this.actions.innerHTML = buttonsHtml;
+            }
+            this.overlay.style.display = 'flex';
+            const input = this.box.querySelector('input');
+            if(input) input.focus();
+        },
+        close: function() {
+            if(this.resolvePromise) this.resolvePromise(null);
+            this.reset();
+        },
+        confirm: function(title, msg, danger = false) {
+            return new Promise((resolve) => {
+                const btnClass = danger ? 'btn-danger' : 'btn';
+                const html = `
+                    <button class="btn ${btnClass}" id="sys-confirm-btn">CONFIRM</button>
+                    <button class="btn" onclick="SystemUI.close()">CANCEL</button>
+                `;
+                this.show(title, `<p>${msg}</p>`, html);
+                const confirmBtn = document.getElementById('sys-confirm-btn');
+                confirmBtn.onclick = () => { resolve(true); this.reset(); };
+                this.resolvePromise = (val) => { if(val === null) resolve(false); };
+                confirmBtn.focus();
+            });
+        },
+        prompt: function(title, msg, type = 'text') {
+            return new Promise((resolve) => {
+                const html = `
+                    <p>${msg}</p>
+                    <input type="${type}" id="sys-prompt-input" class="modal-input" autocomplete="off">
+                `;
+                const btns = `
+                    <button class="btn" id="sys-prompt-ok">OK</button>
+                    <button class="btn" onclick="SystemUI.close()">CANCEL</button>
+                `;
+                this.show(title, html, btns);
+                const input = document.getElementById('sys-prompt-input');
+                const okBtn = document.getElementById('sys-prompt-ok');
+                const submit = () => { resolve(input.value); this.reset(); };
+                okBtn.onclick = submit;
+                input.onkeydown = (e) => { if(e.key === 'Enter') submit(); };
+                this.resolvePromise = (val) => { if(val === null) resolve(null); };
+                input.focus();
+            });
+        }
+    };
+
+    document.getElementById('modal-overlay').addEventListener('keydown', (e) => {
+        if(e.key === 'Escape') { SystemUI.close(); e.preventDefault(); }
+    });
+
+    function resetPass() {
+        const e = document.getElementById('email').value;
+        if(!e) return logActivity("ENTER EMAIL FOR RECOVERY", 'error');
+        auth.sendPasswordResetEmail(e).then(() => logActivity("RECOVERY EMAIL SENT", 'info'));
+    }
+
+    async function confirmLogout() {
+        const yes = await SystemUI.confirm("TERMINATE SESSION?", "Sync will stop.", true);
+        if (!yes) return;
+        _isMaster = false; _isUser = false; currentUser = null;
+        activeFolder = 'INBOX'; trashUnlocked = false;
+        document.getElementById('app-layer').style.display = 'none';
+        showScreen('landing-layer');
+        try { auth.signOut(); } catch(e) {}
+        logActivity('LOGGED OUT', 'error');
+    }
+
+    auth.onAuthStateChanged(user => {
+        if (_isUser) return;
+        if (user && user.email) {
+            _isMaster = false; _isUser = false;
+            showApp('ADMIN: ' + user.email.split('@')[0].toUpperCase(), false);
+        } else if (!user) {
+            // শুধু তখনই landing দেখাও যখন app layer visible আছে কিন্তু face layer না
+            if (document.getElementById('app-layer').style.display === 'flex' && 
+                document.getElementById('face-layer').style.display !== 'flex') {
+                document.getElementById('app-layer').style.display = 'none';
+                currentUser = null;
+                showScreen('landing-layer');
+            }
+        }
+    });  
+
+    function getLocalCache() { return JSON.parse(localStorage.getItem(CACHE_KEY_PREFIX + currentUser)) || {}; }
+    function setLocalCache(data) { localStorage.setItem(CACHE_KEY_PREFIX + currentUser, JSON.stringify(data)); }
+    function getOfflineQueue() { return JSON.parse(localStorage.getItem(QUEUE_KEY_PREFIX + currentUser)) || {}; }
+    function addToOfflineQueue(id, data) {
+        const queue = getOfflineQueue();
+        queue[id] = data;
+        localStorage.setItem(QUEUE_KEY_PREFIX + currentUser, JSON.stringify(queue));
+    }
+    function removeFromOfflineQueue(id) {
+        const queue = getOfflineQueue();
+        delete queue[id];
+        localStorage.setItem(QUEUE_KEY_PREFIX + currentUser, JSON.stringify(queue));
+    }
+    
+    async function switchFolder(folderName) {
+        if(folderName === 'TRASH') {
+            if(!trashUnlocked) {
+                const pass = await SystemUI.prompt("TRASH BIN LOCKED", "ENTER PASSWORD (Samiya) TO ACCESS:", "password");
+                if(pass === "Samiya") {
+                    trashUnlocked = true;
+                    logActivity("TRASH UNLOCKED", "success");
+                } else {
+                    logActivity("ACCESS DENIED", "error");
+                    return;
+                }
+            }
+        }
+        isSelectionMode = false;
+        selectedNotes.clear();
+        document.getElementById('select-toggle-btn').classList.remove('active');
+        document.getElementById('bulk-toolbar').classList.remove('visible');
+        activeFolder = folderName;
+        renderFolders(getLocalCache());
+        renderNoteList(getLocalCache());
+        clearEditor(true);
+        logActivity(`DIRECTORY: ${folderName}`, "info");
+    }
+
+    function renderFolders(notesData) {
+        const folderList = document.getElementById('folder-list');
+        folderList.innerHTML = '';
+        knownFolders = new Set(['INBOX']);
+        let trashCount = 0;
+        if(notesData) {
+            Object.values(notesData).forEach(note => {
+                const nf = note.folder || 'INBOX';
+                if(nf === 'TRASH') trashCount++;
+                else knownFolders.add(nf);
+            });
+        }
+        const sorted = Array.from(knownFolders).sort();
+        if(sorted.indexOf('INBOX') > -1) {
+            sorted.splice(sorted.indexOf('INBOX'), 1);
+            sorted.unshift('INBOX');
+        }
+        sorted.forEach(folder => {
+            const div = document.createElement('div');
+            div.className = `folder-item ${activeFolder === folder ? 'active' : ''}`;
+            let count = 0;
+            if(notesData) Object.values(notesData).forEach(n => { if((n.folder||'INBOX') === folder) count++; });
+            let manageBtn = folder !== 'INBOX' ? `<i class="fas fa-cog folder-ops" style="margin-left:5px; opacity:0.5; cursor:pointer;" onclick="event.stopPropagation(); manageFolder('${folder}')" title="Manage"></i>` : '';
+            div.innerHTML = `<span><i class="fas fa-folder${activeFolder===folder?'-open':''}"></i> ${folder}</span> 
+                             <span style="display:flex; align-items:center; gap:5px;">
+                                <span style="opacity:0.5; font-size:0.7rem;">${count}</span>
+                                ${manageBtn}
+                             </span>`;
+            div.onclick = () => switchFolder(folder);
+            folderList.appendChild(div);
+        });
+        const trashDiv = document.createElement('div');
+        trashDiv.className = `folder-item trash ${activeFolder === 'TRASH' ? 'active' : ''}`;
+        trashDiv.innerHTML = `<span><i class="fas fa-trash-alt"></i> TRASH BIN</span><span>${trashCount}</span>`;
+        trashDiv.onclick = () => switchFolder('TRASH');
+        folderList.appendChild(trashDiv);
+    }
+
+    function manageFolder(folder) {
+        const html = `
+            <p style="margin-bottom:15px; color:var(--neon-main);">MANAGE DIRECTORY: <strong>${folder}</strong></p>
+            <div style="display:flex; flex-direction:column; gap:10px;">
+                <button class="btn btn-info" onclick="renameFolder('${folder}')">RENAME DIRECTORY</button>
+                <button class="btn btn-danger" onclick="deleteFolder('${folder}')">DELETE DIRECTORY</button>
+            </div>
+            <p style="font-size:0.7rem; color:#666; margin-top:15px;">Deleting a folder moves notes to INBOX.</p>
+        `;
+        SystemUI.show("DIRECTORY OPTIONS", html);
+    }
+
+    async function renameFolder(oldName) {
+        const newName = await SystemUI.prompt("RENAME DIRECTORY", `Rename ${oldName} to:`);
+        if(!newName) return;
+        const clean = newName.toUpperCase().replace(/[^A-Z0-9_-]/g, ''); 
+        if(!clean || clean === oldName) return;
+        const cache = getLocalCache();
+        let count = 0;
+        Object.keys(cache).forEach(id => {
+            if(cache[id].folder === oldName) {
+                cache[id].folder = clean;
+                if(navigator.onLine) db.ref(`notes/${currentUser}/${id}/folder`).set(clean);
+                count++;
+            }
+        });
+        setLocalCache(cache);
+        if(activeFolder === oldName) activeFolder = clean;
+        renderFolders(cache);
+        renderNoteList(cache);
+        SystemUI.close();
+        logActivity(`RENAMED ${count} FILES`, "success");
+    }
+
+    async function deleteFolder(folder) {
+        const confirm = await SystemUI.confirm("DELETE DIRECTORY?", `Notes in <b>${folder}</b> will be moved to INBOX.`, true);
+        if(!confirm) return;
+        const cache = getLocalCache();
+        Object.keys(cache).forEach(id => {
+            if(cache[id].folder === folder) {
+                cache[id].folder = 'INBOX';
+                if(navigator.onLine) db.ref(`notes/${currentUser}/${id}/folder`).set('INBOX');
+            }
+        });
+        setLocalCache(cache);
+        activeFolder = 'INBOX';
+        renderFolders(cache);
+        renderNoteList(cache);
+        SystemUI.close();
+        logActivity("DIRECTORY REMOVED", "error");
+    }
+    
+    async function createFolder() {
+        const name = await SystemUI.prompt("NEW DIRECTORY", "Enter Folder Name:", "text");
+        if(name) {
+            const clean = name.toUpperCase().replace(/[^A-Z0-9_-]/g, '');
+            if(clean.length > 0) {
+                activeFolder = clean;
+                renderFolders(getLocalCache());
+                renderNoteList(getLocalCache());
+                createNewNote(); 
+                logActivity("DIRECTORY CREATED", "success");
+            }
+        }
+    }
+
+    function toggleSelectionMode() {
+        isSelectionMode = !isSelectionMode;
+        const btn = document.getElementById('select-toggle-btn');
+        if(isSelectionMode) btn.classList.add('active');
+        else btn.classList.remove('active');
+        if(!isSelectionMode) {
+            selectedNotes.clear();
+            document.getElementById('bulk-toolbar').classList.remove('visible');
+        }
+        renderNoteList(getLocalCache());
+        logActivity(isSelectionMode ? "SELECTION MODE: ACTIVE" : "SELECTION MODE: OFF", "info");
+    }
+
+    function toggleNoteSelection(id, event) {
+        if(event) event.stopPropagation();
+        if (selectedNotes.has(id)) selectedNotes.delete(id);
+        else selectedNotes.add(id);
+        renderNoteList(getLocalCache());
+        updateBulkToolbar();
+    }
+
+    function updateBulkToolbar() {
+        const toolbar = document.getElementById('bulk-toolbar');
+        const countSpan = document.getElementById('sel-count');
+        const btnsDiv = document.getElementById('bulk-btns');
+        if(selectedNotes.size > 0) {
+            toolbar.classList.add('visible');
+            countSpan.innerText = selectedNotes.size;
+            btnsDiv.innerHTML = '';
+            if(activeFolder === 'TRASH') {
+                const btnRes = document.createElement('button');
+                btnRes.className = 'btn btn-info'; btnRes.innerText = 'RESTORE SELECTED'; btnRes.onclick = bulkRestore;
+                btnsDiv.appendChild(btnRes);
+                const btnDel = document.createElement('button');
+                btnDel.className = 'btn btn-danger'; btnDel.innerText = 'DELETE PERMANENTLY'; btnDel.onclick = bulkPermanentDelete;
+                btnsDiv.appendChild(btnDel);
+            } else {
+                const btnTrash = document.createElement('button');
+                btnTrash.className = 'btn btn-danger'; btnTrash.innerText = 'MOVE TO TRASH'; btnTrash.onclick = bulkMoveToTrash;
+                btnsDiv.appendChild(btnTrash);
+            }
+        } else {
+            toolbar.classList.remove('visible');
+        }
+    }
+
+    async function bulkMoveToTrash() {
+        if(selectedNotes.size === 0) return;
+        const confirm = await SystemUI.confirm("BULK DELETE", `Move ${selectedNotes.size} notes to Trash?`, true);
+        if(!confirm) return;
+        const cache = getLocalCache();
+        let count = 0;
+        selectedNotes.forEach(id => {
+            if(cache[id]) {
+                cache[id].folder = 'TRASH';
+                if(navigator.onLine && !id.startsWith('temp_')) db.ref(`notes/${currentUser}/${id}/folder`).set('TRASH');
+                else addToOfflineQueue(id, { ...cache[id] });
+                count++;
+            }
+        });
+        setLocalCache(cache);
+        selectedNotes.clear();
+        isSelectionMode = false;
+        document.getElementById('select-toggle-btn').classList.remove('active');
+        document.getElementById('bulk-toolbar').classList.remove('visible');
+        renderNoteList(cache);
+        logActivity(`MOVED ${count} ITEMS TO TRASH`, "error");
+    }
+
+    async function bulkRestore() {
+        if(selectedNotes.size === 0) return;
+        const cache = getLocalCache();
+        let count = 0;
+        selectedNotes.forEach(id => {
+            if(cache[id]) {
+                cache[id].folder = 'INBOX';
+                if(navigator.onLine && !id.startsWith('temp_')) db.ref(`notes/${currentUser}/${id}/folder`).set('INBOX');
+                else addToOfflineQueue(id, { ...cache[id] });
+                count++;
+            }
+        });
+        setLocalCache(cache);
+        selectedNotes.clear();
+        updateBulkToolbar();
+        renderNoteList(cache);
+        logActivity(`RESTORED ${count} ITEMS`, "success");
+    }
+
+    async function bulkPermanentDelete() {
+        if(selectedNotes.size === 0) return;
+        const confirm = await SystemUI.confirm("DELETE FOREVER?", `Permanently remove ${selectedNotes.size} notes?`, true);
+        if(!confirm) return;
+        const cache = getLocalCache();
+        selectedNotes.forEach(id => {
+            delete cache[id];
+            if(navigator.onLine && !id.startsWith('temp_')) db.ref(`notes/${currentUser}/${id}`).remove();
+        });
+        setLocalCache(cache);
+        selectedNotes.clear();
+        updateBulkToolbar();
+        renderNoteList(cache);
+        logActivity("SELECTED ITEMS DELETED", "error");
+    }
+
+    function renderNoteList(data) {
+        const list = document.getElementById('notes-list');  
+        const activeId = document.getElementById('current-id').value;
+        list.innerHTML = '';  
+        renderFolders(data);
+        let allTags = new Set();
+        let notesArr = [];
+        if (data) {  
+            Object.entries(data).forEach(([id, note]) => {  
+                if (!note) return;
+                const noteFolder = note.folder || 'INBOX';
+                if(noteFolder !== activeFolder) return;
+                notesArr.push({id, ...note});
+                if (!note.lockHash && note.text) {
+                    const tags = note.text.match(/#[a-z0-9_]+/gi);
+                    if(tags) tags.forEach(t => allTags.add(t.toLowerCase()));
+                }
+            });
+            notesArr.sort((a, b) => {
+                if (a.pinned === b.pinned) return (b.timestamp || 0) - (a.timestamp || 0);
+                return a.pinned ? -1 : 1;
+            });
+            renderTags(allTags);
+            notesArr.forEach(note => {
+                const noteText = (note.text || '').toLowerCase();
+                if(filterTag && !note.lockHash && !noteText.includes(filterTag)) return;
+                const div = document.createElement('div');
+                const isSelected = selectedNotes.has(note.id);
+                div.className = 'note-item' + (note.id === activeId ? ' active' : '') + (note.pinned ? ' pinned' : '') + (isSelected ? ' selected' : '');
+                const isDirty = getOfflineQueue()[note.id] ? ' <span style="color:var(--neon-yellow)">*</span>' : '';
+                const isLocked = note.lockHash ? ' <span style="color:var(--neon-red)">[LOCKED]</span>' : '';
+                let checkHtml = isSelectionMode ? `<div class="custom-checkbox ${isSelected ? 'checked' : ''}"></div>` : '';
+                div.innerHTML = `
+                    <div style="display:flex; align-items:center; flex:1; overflow:hidden;">
+                        ${checkHtml}
+                        <div style="flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+                            <i class="fas fa-file-alt" style="font-size:0.7rem; margin-right:8px; opacity:0.5;"></i> 
+                            ${(note.title || 'UNTITLED') + isDirty + isLocked}
+                        </div>
+                    </div>
+                    <i class="fas fa-star pin-icon"></i>
+                `;
+                if(isSelectionMode) div.onclick = (e) => toggleNoteSelection(note.id, e);
+                else div.onclick = () => loadNoteIntoEditor(note.id, note);  
+                list.appendChild(div);  
+            });  
+        }
+        if(notesArr.length === 0) list.innerHTML = '<div style="padding:20px; text-align:center; color:#444;">EMPTY DIRECTORY</div>';
+    }
+
+    function renderTags(tags) {
+        const cloud = document.getElementById('tag-cloud');
+        cloud.innerHTML = '';
+        if(activeFolder === 'TRASH' || tags.size === 0) { cloud.style.display = 'none'; return; }
+        cloud.style.display = 'flex';
+        const allBtn = document.createElement('span');
+        allBtn.className = `tag-pill ${!filterTag ? 'active' : ''}`;
+        allBtn.innerText = "ALL";
+        allBtn.onclick = () => { filterTag = null; loadNotes(); };
+        cloud.appendChild(allBtn);
+        tags.forEach(tag => {
+            const pill = document.createElement('span');
+            pill.className = `tag-pill ${filterTag === tag ? 'active' : ''}`;
+            pill.innerText = tag;
+            pill.onclick = () => { filterTag = tag; loadNotes(); };
+            cloud.appendChild(pill);
+        });
+    }
+
+    function loadNotes() {  
+        const localData = getLocalCache();
+        renderNoteList(localData);
+        db.ref(`notes/${currentUser}`).on('value', snap => {  
+            const serverData = snap.val() || {};
+            const currentQueue = getOfflineQueue();
+            const mergedData = { ...serverData };
+            Object.keys(currentQueue).forEach(qid => mergedData[qid] = currentQueue[qid]);
+            setLocalCache(mergedData);
+            renderNoteList(mergedData);
+        });
+        if(navigator.onLine) processOfflineQueue();
+    }  
+
+    async function loadNoteIntoEditor(id, note) {
+        if (note.lockHash) {
+            const password = await SystemUI.prompt("SECURE NOTE", "ENTER DECRYPTION KEY:", "password");
+            if (!password) return; 
+            const inputHash = await sha256(password);
+            if (inputHash !== note.lockHash) { logActivity("ACCESS DENIED", "error"); return; }
+        }
+        document.getElementById('current-id').value = id;  
+        document.getElementById('doc-title').value = note.title || '';  
+        document.getElementById('doc-body').value = note.text || '';  
+        document.getElementById('current-folder-ref').value = note.folder || 'INBOX';
+        const dateStr = note.timestamp ? new Date(note.timestamp).toLocaleString() : 'Just now';
+        document.getElementById('date-display').innerText = dateStr;
+        const isPinned = note.pinned || false;
+        document.getElementById('is-pinned').value = isPinned;
+        updatePinBtnUI(isPinned);
+        if(activeFolder === 'TRASH') {
+            document.getElementById('del-btn').style.display = 'none';
+            document.getElementById('trash-ops').style.display = 'flex';
+            document.getElementById('doc-body').setAttribute('readonly', true);
+            document.getElementById('doc-title').setAttribute('readonly', true);
+        } else {
+            document.getElementById('trash-ops').style.display = 'none';
+            if (_readOnly) {
+                document.getElementById('del-btn').style.display = 'none';
+                document.getElementById('doc-body').setAttribute('readonly', true);
+                document.getElementById('doc-title').setAttribute('readonly', true);
+            } else {
+                document.getElementById('del-btn').style.display = 'inline-block';
+                document.getElementById('doc-body').removeAttribute('readonly');
+                document.getElementById('doc-title').removeAttribute('readonly');
+            }
+        }
+        updateWordCount(); 
+        if(document.getElementById('md-preview').classList.contains('active')) {
+            document.getElementById('md-preview').innerHTML = marked.parse(note.text || '');
+        }
+        noteHistory.reset();
+        noteHistory.push(note.text || '');
+        document.querySelectorAll('.note-item').forEach(i => i.classList.remove('active'));
+        renderNoteList(getLocalCache());
+        logActivity(`OPENED: ${note.title || 'UNTITLED'}`, "info");
+        if(window.innerWidth <= 768) document.getElementById('sidebar').classList.remove('open');
+    }
+
+    async function saveNote(isAuto = false) {  
+        if (!currentUser) return;
+        if (_readOnly) { if(!isAuto) logActivity("READ ONLY ACCESS — CANNOT SAVE", "error"); return; }
+        if (activeFolder === 'TRASH') return;
+        let id = document.getElementById('current-id').value;  
+        const title = document.getElementById('doc-title').value;  
+        const text = document.getElementById('doc-body').value;  
+        if(!id && !title && !text) return;
+        const isNew = !id;
+        if (isNew) {
+            id = navigator.onLine ? db.ref(`notes/${currentUser}`).push().key : `temp_${Date.now()}`;
+            document.getElementById('current-id').value = id;
+            document.getElementById('del-btn').style.display = 'inline-block';
+        }
+        const pinned = document.getElementById('is-pinned').value === 'true';
+        let folder = isNew ? activeFolder : document.getElementById('current-folder-ref').value;
+        if(!folder || folder === 'TRASH') folder = 'INBOX'; 
+        const cache = getLocalCache();
+        const existingNote = cache[id] || {};
+        const lockHash = existingNote.lockHash || null;
+        const ts = Date.now();
+        const payload = { title, text, pinned, folder, timestamp: ts };  
+        if (lockHash) payload.lockHash = lockHash;
+        cache[id] = payload;
+        setLocalCache(cache);
+        renderNoteList(cache); 
+        document.getElementById('date-display').innerText = new Date(ts).toLocaleString();
+        if(noteHistory.current() !== text) noteHistory.push(text);
+        if (navigator.onLine) {
+            document.getElementById('save-indicator').innerText = "[SYNCING...]";
+            const ref = db.ref(`notes/${currentUser}/${id}`);
+            const updatePromise = (isNew || id.startsWith('temp_')) ? ref.set(payload) : ref.update(payload);
+            updatePromise.then(() => {
+                document.getElementById('save-indicator').innerText = "[SAVED]";
+                if(isAuto) logActivity("AUTO-SAVE COMPLETE", "info");
+                else logActivity("SYNC COMPLETE", "success");
+            }).catch(err => {
+                addToOfflineQueue(id, payload);
+                document.getElementById('save-indicator').innerText = "[QUEUED]";
+                logActivity("NET ERROR: QUEUED", "error");
+            });
+        } else {
+            addToOfflineQueue(id, payload);
+            document.getElementById('save-indicator').innerText = "[LOCAL]";
+            logActivity(isAuto ? "AUTO-SAVED (LOCAL)" : "SAVED LOCALLY", "info");
+        }
+    } 
+
+    async function moveToTrash() {
+        if (_readOnly) { logActivity("READ ONLY ACCESS — CANNOT DELETE", "error"); return; }
+        const confirm = await SystemUI.confirm("MOVE TO TRASH?", "This note will be moved to the Trash Bin.", true);
+        if(!confirm) return;
+        const id = document.getElementById('current-id').value;
+        if(!id) return;
+        const cache = getLocalCache();
+        if(cache[id]) {
+            cache[id].folder = 'TRASH';
+            setLocalCache(cache);
+            if(navigator.onLine && !id.startsWith('temp_')) db.ref(`notes/${currentUser}/${id}/folder`).set('TRASH');
+            else addToOfflineQueue(id, { ...cache[id] });
+            clearEditor(true);
+            renderNoteList(cache);
+            logActivity("MOVED TO TRASH BIN", "error");
+        }
+    }
+
+    async function restoreNote() {
+        const confirm = await SystemUI.confirm("RESTORE NOTE?", "This note will be moved back to Inbox.", false);
+        if(!confirm) return;
+        const id = document.getElementById('current-id').value;
+        if(!id) return;
+        const cache = getLocalCache();
+        if(cache[id]) {
+            cache[id].folder = 'INBOX';
+            setLocalCache(cache);
+            if(navigator.onLine && !id.startsWith('temp_')) db.ref(`notes/${currentUser}/${id}/folder`).set('INBOX');
+            else addToOfflineQueue(id, { ...cache[id] });
+            clearEditor(true);
+            renderNoteList(cache); 
+            logActivity("NOTE RESTORED", "success");
+        }
+    }
+
+    async function permanentDelete() {
+        const yes = await SystemUI.confirm("DELETE PERMANENTLY?", "This cannot be undone.", true);
+        if(yes) {
+            const id = document.getElementById('current-id').value;
+            const cache = getLocalCache();
+            delete cache[id];
+            setLocalCache(cache);
+            if(navigator.onLine && !id.startsWith('temp_')) db.ref(`notes/${currentUser}/${id}`).remove();
+            clearEditor(true);
+            renderNoteList(cache);
+            logActivity("DELETED FOREVER", "error");
+        }
+    }
+
+    function processOfflineQueue() {
+        const queue = getOfflineQueue();
+        Object.keys(queue).forEach(localId => {
+            const data = queue[localId];
+            if (localId.startsWith('temp_')) {
+                const newRef = db.ref(`notes/${currentUser}`).push();
+                newRef.set(data).then(() => {
+                    const cache = getLocalCache();
+                    delete cache[localId]; cache[newRef.key] = data; 
+                    setLocalCache(cache);
+                    removeFromOfflineQueue(localId); 
+                    if (document.getElementById('current-id').value === localId) document.getElementById('current-id').value = newRef.key;
+                    renderNoteList(cache);
+                });
+            } else {
+                db.ref(`notes/${currentUser}/${localId}`).update(data).then(() => removeFromOfflineQueue(localId));
+            }
+        });
+    }
+
+    function checkConnection() {
+        const statusDiv = document.getElementById('status-line');
+        if (navigator.onLine) {
+            statusDiv.innerText = "STATUS: ONLINE [SECURE]";
+            statusDiv.style.color = "var(--neon-main)";
+            processOfflineQueue();
+        } else {
+            statusDiv.innerText = "STATUS: OFFLINE MODE";
+            statusDiv.style.color = "var(--neon-red)";
+        }
+    }
+    window.addEventListener('online', checkConnection);
+    window.addEventListener('offline', checkConnection);
+
+    function toggleMarkdown() {
+        const preview = document.getElementById('md-preview');
+        const editor = document.getElementById('doc-body');
+        const isActive = preview.classList.toggle('active');
+        if(isActive) {
+            preview.innerHTML = marked.parse(editor.value);
+            if(window.innerWidth > 768) editor.style.width = '50%';
+        } else {
+            editor.style.width = '100%';
+        }
+        logActivity("MD PREVIEW TOGGLED", "info");
+    }
+
+    function togglePin() {
+        const el = document.getElementById('is-pinned');
+        const newState = !(el.value === 'true');
+        el.value = newState;
+        updatePinBtnUI(newState);
+        saveNote(true);
+        logActivity("PIN TOGGLED", "info");
+    }
+    
+    function updatePinBtnUI(isPinned) {
+        const btn = document.getElementById('pin-btn');
+        if(isPinned) btn.innerHTML = '<i class="fas fa-star" style="color:var(--neon-yellow)"></i>';
+        else btn.innerHTML = '<i class="far fa-star"></i>';
+    }
+
+    function editorUndo() {
+        const prev = noteHistory.undo();
+        if(prev !== null) { document.getElementById('doc-body').value = prev; updateWordCount(); logActivity("UNDO", "info"); }
+    }
+    function editorRedo() {
+        const next = noteHistory.redo();
+        if(next !== null) { document.getElementById('doc-body').value = next; updateWordCount(); logActivity("REDO", "info"); }
+    }
+
+    function openVersionHistory() {
+        const id = document.getElementById('current-id').value;
+        if(!id) return logActivity("SAVE FILE FIRST", "error");
+        SystemUI.show("SNAPSHOT MANAGER", 
+        `<p>Create a manual restore point for this session?</p>
+         <div id="snapshot-list" style="font-size:0.8rem; color:#888; margin-top:15px; max-height:200px; overflow-y:auto;">Fetching...</div>`,
+         `<button class="btn btn-info" onclick="createSnapshot('${id}')">CREATE SNAPSHOT</button> <button class="btn" onclick="SystemUI.close()">CLOSE</button>`);
+         loadSnapshots(id);
+    }
+
+    function createSnapshot(id) {
+        const text = document.getElementById('doc-body').value;
+        const ts = Date.now();
+        db.ref(`snapshots/${currentUser}/${id}`).push({ text, ts }).then(() => {
+            logActivity("SNAPSHOT SAVED", "success");
+            loadSnapshots(id);
+        });
+    }
+
+    function loadSnapshots(id) {
+        db.ref(`snapshots/${currentUser}/${id}`).limitToLast(5).once('value', snap => {
+            const list = document.getElementById('snapshot-list');
+            list.innerHTML = '';
+            if(!snap.exists()) { list.innerHTML = "No snapshots found."; return; }
+            snap.forEach(child => {
+                const val = child.val();
+                const date = new Date(val.ts).toLocaleString();
+                const safeText = (val.text || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+                list.innerHTML += `<div style="padding:5px; border-bottom:1px dashed #333; display:flex; justify-content:space-between;">
+                    <span>${date}</span>
+                    <button class="btn" style="padding:2px 5px;" onclick="restoreSnapshot('${safeText}')">LOAD</button>
+                </div>`;
+            });
+        });
+    }
+
+    window.restoreSnapshot = (text) => {
+        document.getElementById('doc-body').value = text;
+        updateWordCount();
+        saveNote(false);
+        SystemUI.close();
+        logActivity("VERSION RESTORED", "info");
+    };
+
+    async function openPasscodeManager() {
+        SystemUI.show("🔑 PASSCODE MANAGER", '<div id="pc-mgr-body"><div style="text-align:center;padding:20px;color:#555;">LOADING...</div></div>',
+            '<button class="btn btn-info" onclick="openAddPasscode()">➕ ADD PASSCODE</button> <button class="btn" onclick="SystemUI.close()">CLOSE</button>');
+        await renderPasscodeList();
+    }
+
+    async function renderPasscodeList() {
+        const body = document.getElementById('pc-mgr-body');
+        if (!body) return;
+        try {
+            let masterEnabled = true;
+            try {
+                const mSnap = await db.ref('config/master').once('value');
+                if (mSnap.exists()) masterEnabled = mSnap.val().enabled !== false;
+            } catch(e) {}
+            const snap = await db.ref('passcodes').once('value');
+            const codes = snap.val() || {};
+            const now = new Date();
+            let html = '';
+            html += `<div style="background:#0a0a00;border:1px solid #554400;border-radius:8px;padding:12px;margin-bottom:8px;">
+                <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+                    <div>
+                        <div style="font-size:0.8rem;font-weight:700;color:var(--neon-yellow);">👑 MASTER PASSCODE
+                            <span style="font-size:0.65rem;padding:1px 6px;border-radius:3px;margin-left:6px;background:${masterEnabled?'rgba(0,255,0,0.1)':'rgba(255,0,60,0.1)'};color:${masterEnabled?'var(--neon-main)':'var(--neon-red)'};border:1px solid ${masterEnabled?'#0a0':'#500'};">${masterEnabled?'ACTIVE':'DISABLED'}</span>
+                        </div>
+                        <div style="font-family:monospace;font-size:0.85rem;color:var(--neon-yellow);margin-top:4px;">🔑 ${MASTER}</div>
+                        <div style="font-size:0.65rem;color:#555;margin-top:2px;">Full access · Unlimited · Never expires</div>
+                    </div>
+                    <button class="btn ${masterEnabled?'btn-danger':'btn-info'}" style="padding:4px 10px;font-size:0.7rem;" onclick="toggleMasterPasscode(${!masterEnabled})">${masterEnabled?'DISABLE':'ENABLE'}</button>
+                </div>
+            </div>`;
+            const entries = Object.entries(codes);
+            if (entries.length === 0) {
+                html += '<div style="text-align:center;color:#555;font-size:0.8rem;padding:16px;">No user passcodes yet.</div>';
+            } else {
+                entries.forEach(([id, pc]) => {
+                    const expired = pc.expiry && new Date(pc.expiry) < now;
+                    const used = pc.usedCount || 0, limit = pc.limit || 0;
+                    const limitReached = limit > 0 && used >= limit;
+                    let status, statusColor, statusBg, statusBorder;
+                    if (expired) { status='EXPIRED'; statusColor='var(--neon-yellow)'; statusBg='rgba(255,176,0,0.1)'; statusBorder='#554400'; }
+                    else if (!pc.enabled || limitReached) { status='DISABLED'; statusColor='var(--neon-red)'; statusBg='rgba(255,0,60,0.1)'; statusBorder='#500'; }
+                    else { status='ACTIVE'; statusColor='var(--neon-main)'; statusBg='rgba(0,255,0,0.1)'; statusBorder='#0a0'; }
+                    html += `<div style="background:#050505;border:1px solid #222;border-radius:8px;padding:12px;margin-bottom:8px;">
+                        <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;">
+                            <div style="flex:1;min-width:0;">
+                                <div style="font-size:0.8rem;font-weight:700;color:#ccc;display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+                                    ${pc.label||'USER'}
+                                    <span style="font-size:0.65rem;padding:1px 6px;border-radius:3px;background:${statusBg};color:${statusColor};border:1px solid ${statusBorder};">${status}</span>
+                                    ${pc.oneTime?'<span style="font-size:0.65rem;padding:1px 6px;border-radius:3px;background:rgba(0,243,255,0.1);color:var(--neon-blue);border:1px solid #004d4d;">1× USE</span>':''}
+                                </div>
+                                <div style="font-family:monospace;font-size:0.85rem;color:var(--neon-blue);margin-top:4px;">🔑 ${pc.code}</div>
+                                <div style="font-size:0.65rem;color:#555;margin-top:2px;">Used: ${used}${limit?' / '+limit+' max':' (unlimited)'}${pc.expiry?' · Expires: '+pc.expiry:''}</div>
+                            </div>
+                            <div style="display:flex;flex-direction:column;gap:4px;">
+                                <button class="btn ${pc.enabled?'btn-danger':'btn-info'}" style="padding:3px 8px;font-size:0.65rem;" onclick="togglePasscode('${id}',${!pc.enabled})">${pc.enabled?'DISABLE':'ENABLE'}</button>
+                                <button class="btn btn-danger" style="padding:3px 8px;font-size:0.65rem;" onclick="deletePasscode('${id}')">DELETE</button>
+                            </div>
+                        </div>
+                    </div>`;
+                });
+            }
+            body.innerHTML = html;
+        } catch(e) {
+            if(body) body.innerHTML = '<div style="color:var(--neon-red);font-size:0.8rem;padding:12px;">ERROR: ' + e.message + '</div>';
+        }
+    }
+
+    async function toggleMasterPasscode(enable) {
+        try {
+            await db.ref('config/master').set({ enabled: enable });
+            logActivity('MASTER PASSCODE ' + (enable?'ENABLED':'DISABLED'), enable?'success':'error');
+            await renderPasscodeList();
+        } catch(e) { logActivity('FAILED: ' + e.message, 'error'); }
+    }
+
+    async function togglePasscode(id, enabled) {
+        try {
+            await db.ref('passcodes/' + id).update({ enabled });
+            logActivity('PASSCODE ' + (enabled?'ENABLED':'DISABLED'), enabled?'success':'error');
+            await renderPasscodeList();
+        } catch(e) { logActivity('FAILED: ' + e.message, 'error'); }
+    }
+
+    async function deletePasscode(id) {
+        const yes = await SystemUI.confirm('DELETE PASSCODE?', 'This cannot be undone.', true);
+        if (!yes) return;
+        try {
+            await db.ref('passcodes/' + id).remove();
+            logActivity('PASSCODE DELETED', 'error');
+            await renderPasscodeList();
+        } catch(e) { logActivity('FAILED: ' + e.message, 'error'); }
+    }
+
+    async function openAddPasscode() {
+        const html = `
+            <div style="display:flex;flex-direction:column;gap:10px;">
+                <div>
+                    <label style="font-size:0.65rem;color:#666;letter-spacing:1px;">LABEL</label>
+                    <input type="text" id="pc-label" class="modal-input" placeholder="Passcode label">
+                </div>
+                <div>
+                    <label style="font-size:0.65rem;color:#666;letter-spacing:1px;">PASSCODE</label>
+                    <input type="text" id="pc-code" class="modal-input" placeholder="e.g. mypass123">
+                </div>
+                <div>
+                    <label style="font-size:0.65rem;color:#666;letter-spacing:1px;">ACCESS LIMIT (0 = unlimited)</label>
+                    <input type="number" id="pc-limit" class="modal-input" value="0" min="0">
+                </div>
+                <div>
+                    <label style="font-size:0.65rem;color:#666;letter-spacing:1px;">EXPIRY DATE</label>
+                    <input type="text" id="pc-expiry" class="modal-input" placeholder="YYYY-MM-DD">
+                </div>
+                <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-top:1px solid #222;">
+                    <div>
+                        <div style="font-size:0.8rem;font-weight:600;">Enable immediately</div>
+                    </div>
+                    <input type="checkbox" id="pc-enabled" checked style="width:16px;height:16px;accent-color:var(--neon-main);">
+                </div>
+                <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-top:1px solid #222;">
+                    <div>
+                        <div style="font-size:0.8rem;font-weight:600;">🔂 One-Time Passcode</div>
+                    </div>
+                    <input type="checkbox" id="pc-onetime" style="width:16px;height:16px;accent-color:var(--neon-blue);">
+                </div>
+            </div>`;
+        SystemUI.show('➕ ADD PASSCODE', html,
+            '<button class="btn btn-info" onclick="saveNewPasscode()">💾 SAVE</button> <button class="btn" onclick="openPasscodeManager()">CANCEL</button>');
+    }
+
+    async function saveNewPasscode() {
+        const label = document.getElementById('pc-label').value.trim();
+        const code = document.getElementById('pc-code').value.trim();
+        const limit = parseInt(document.getElementById('pc-limit').value) || 0;
+        const expiry = document.getElementById('pc-expiry').value.trim();
+        const enabled = document.getElementById('pc-enabled').checked;
+        const oneTime = document.getElementById('pc-onetime').checked;
+        if (!code) { logActivity('ENTER A PASSCODE!', 'error'); return; }
+        try {
+            await db.ref('passcodes').push({
+                label: label || 'User', code, limit: oneTime ? 1 : limit,
+                expiry: expiry || '', enabled, usedCount: 0,
+                createdAt: Date.now(), oneTime
+            });
+            logActivity('PASSCODE ADDED!', 'success');
+            openPasscodeManager();
+        } catch(e) { logActivity('FAILED: ' + e.message, 'error'); }
+    }
+
+    function openSettings() {
+        const themes = [
+            { name: 'MATRIX', main: '#0f0', bg: '#020202' },
+            { name: 'RETRO AMBER', main: '#ffb000', bg: '#1a1000' },
+            { name: 'CYBERPUNK', main: '#00f3ff', bg: '#050a14' },
+            { name: 'CRIMSON', main: '#ff003c', bg: '#110000' },
+            { name: 'ICE', main: '#ffffff', bg: '#000000' }
+        ];
+        let html = '<div class="theme-grid">';
+        themes.forEach(t => {
+            html += `<div class="theme-opt" style="color:${t.main}; background:${t.bg}" onclick="setTheme('${t.main}', '${t.bg}')">${t.name}</div>`;
+        });
+        html += '</div>';
+        SystemUI.show("SYSTEM CONFIGURATION", html);
+    }
+
+    function setTheme(main, bg) {
+        document.documentElement.style.setProperty('--neon-main', main);
+        document.documentElement.style.setProperty('--bg-deep', bg);
+        SystemUI.close();
+        logActivity("THEME UPDATED", "success");
+    }
+
+    function openExportMenu() {
+        const html = `
+            <div style="display:flex; flex-direction:column; gap:10px;">
+                <label style="color:#666; font-size:0.7rem;">CURRENT NOTE</label>
+                <div style="display:flex; gap:5px;">
+                    <button class="btn" style="flex:1" onclick="exportDoc('txt')">TXT</button>
+                    <button class="btn" style="flex:1" onclick="exportDoc('md')">MD</button>
+                    <button class="btn" style="flex:1" onclick="exportDoc('pdf')">PDF</button>
+                </div>
+                <button class="btn" onclick="exportDoc('email')">SEND VIA EMAIL</button>
+                <div style="margin-top:10px; border-top:1px dashed #333; padding-top:10px;">
+                    <label style="color:var(--neon-blue); font-size:0.7rem;">FULL DATABASE</label>
+                    <button class="btn btn-info" style="width:100%; margin-top:5px;" onclick="exportAllNotes()">BACKUP DATABASE (.JSON)</button>
+                    <button class="btn" style="width:100%; margin-top:5px;" onclick="triggerImport()">RESTORE DATABASE</button>
+                </div>
+            </div>
+        `;
+        SystemUI.show("EXPORT & BACKUP", html);
+    }
+    
+    function exportAllNotes() {
+        const data = getLocalCache();
+        const json = JSON.stringify(data, null, 2);
+        const blob = new Blob([json], { type: 'application/json' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `DB_BACKUP_${new Date().toISOString().slice(0,10)}.json`;
+        a.click();
+        logActivity("DATABASE EXPORTED", "success");
+    }
+
+    function triggerImport() { document.getElementById('restore-input').click(); }
+
+    function importDatabaseFile(input) {
+        if(input.files.length === 0) return;
+        const file = input.files[0];
+        const reader = new FileReader();
+        reader.onload = async (e) => {
+            try {
+                const importedData = JSON.parse(e.target.result);
+                const yes = await SystemUI.confirm("RESTORE DATABASE?", "This will merge imported notes with existing ones.", true);
+                if(yes) {
+                    const current = getLocalCache();
+                    const merged = { ...current, ...importedData };
+                    setLocalCache(merged);
+                    if(navigator.onLine) {
+                        db.ref(`notes/${currentUser}`).update(merged).then(() => logActivity("DATABASE RESTORED & SYNCED", "success"));
+                    } else {
+                        logActivity("RESTORED LOCALLY", "info");
+                    }
+                    loadNotes();
+                    SystemUI.close();
+                }
+            } catch(err) { logActivity("INVALID JSON FILE", "error"); }
+        };
+        reader.readAsText(file);
+    }
+
+    function exportDoc(type) {
+        const title = document.getElementById('doc-title').value || 'untitled';
+        const text = document.getElementById('doc-body').value;
+        if(type === 'email') {
+            window.location.href = `mailto:?subject=${title}&body=${encodeURIComponent(text)}`;
+        } else if (type === 'pdf') {
+            const element = document.createElement('div');
+            element.innerHTML = `<h1>${title}</h1>` + marked.parse(text);
+            html2pdf().from(element).save(title + '.pdf');
+        } else {
+            const blob = new Blob([text], { type: 'text/plain' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = `${title}.${type}`;
+            a.click();
+        }
+        SystemUI.close();
+        logActivity("DOCUMENT EXPORTED", "success");
+    }
+
+    function toggleCommandPalette() {
+        const p = document.getElementById('cmd-palette');
+        const input = document.getElementById('cmd-input');
+        if(p.style.display === 'flex') { p.style.display = 'none'; return; }
+        p.style.display = 'flex';
+        input.value = '';
+        input.focus();
+        renderCommands();
+    }
+
+    const commands = [
+        { name: "New Note", key: "Ctrl+N", action: createNewNote },
+        { name: "Save Note", key: "Ctrl+S", action: () => saveNote(false) },
+        { name: "Delete / Move to Trash", key: "Ctrl+D", action: moveToTrash },
+        { name: "Toggle Full Screen", key: "Ctrl+Shift+F", action: () => document.documentElement.requestFullscreen() },
+        { name: "Toggle Markdown", key: "Ctrl+M", action: toggleMarkdown },
+        { name: "Toggle Pin", key: "Ctrl+P", action: togglePin },
+        { name: "Change Theme", key: "", action: openSettings },
+        { name: "Export Note", key: "", action: openExportMenu },
+        { name: "Keyboard Shortcuts", key: "Ctrl+/", action: showShortcuts },
+        { name: "Log Out", key: "", action: confirmLogout }
+    ];
+
+    function renderCommands(filter = "") {
+        const list = document.getElementById('cmd-list');
+        list.innerHTML = '';
+        let idx = 0;
+        commands.forEach(cmd => {
+            if(cmd.name.toLowerCase().includes(filter.toLowerCase())) {
+                const div = document.createElement('div');
+                div.className = 'cmd-item';
+                if(idx === 0) div.classList.add('selected'); 
+                div.innerHTML = `<span>${cmd.name}</span>${cmd.key ? `<span class="cmd-key">${cmd.key}</span>` : ''}`;
+                div.onclick = () => { cmd.action(); document.getElementById('cmd-palette').style.display = 'none'; };
+                list.appendChild(div);
+                idx++;
+            }
+        });
+    }
+
+    document.getElementById('cmd-input').addEventListener('input', (e) => { renderCommands(e.target.value); });
+    document.getElementById('cmd-input').addEventListener('keydown', (e) => {
+        const items = document.querySelectorAll('.cmd-item');
+        let selected = document.querySelector('.cmd-item.selected');
+        let idx = Array.from(items).indexOf(selected);
+        if(e.key === 'ArrowDown') { idx = (idx + 1) % items.length; selected.classList.remove('selected'); items[idx].classList.add('selected'); items[idx].scrollIntoView({block: 'nearest'}); }
+        else if(e.key === 'ArrowUp') { idx = (idx - 1 + items.length) % items.length; selected.classList.remove('selected'); items[idx].classList.add('selected'); items[idx].scrollIntoView({block: 'nearest'}); }
+        else if(e.key === 'Enter') { if(selected) selected.click(); }
+        else if(e.key === 'Escape') { toggleCommandPalette(); }
+    });
+
+    function generateShareLink() {
+        const id = document.getElementById('current-id').value;
+        if(!id || id.startsWith('temp_')) return logActivity("SYNC FILE BEFORE SHARING", "error");
+        const link = `${window.location.origin}${window.location.pathname}?share=${id}&user=${currentUser}`;
+        navigator.clipboard.writeText(link).then(() => {
+            logActivity("LINK COPIED TO CLIPBOARD", "success");
+            SystemUI.show("SHARE LINK GENERATED", `<input type="text" value="${link}" style="width:100%; background:black; color:white; border:1px solid #333; padding:10px;">`);
+        });
+    }
+
+    function showShortcuts() {
+        const shortcuts = [
+            { cat: "GENERAL", key: "Ctrl + Shift + P", desc: "Command Palette" },
+            { cat: "FILE OPERATIONS", key: "Ctrl + N", desc: "New Note" },
+            { cat: "", key: "Ctrl + S", desc: "Save Note" },
+            { cat: "", key: "Ctrl + D", desc: "Delete / Trash" },
+            { cat: "SYSTEM", key: "Ctrl + Shift + F", desc: "Toggle Full Screen" },
+            { cat: "", key: "Ctrl + Shift + E", desc: "Backup Database" },
+            { cat: "EDITING", key: "Ctrl + Z / Y", desc: "Undo / Redo" },
+            { cat: "", key: "Ctrl + Shift + T", desc: "Insert Timestamp" },
+            { cat: "NAVIGATION", key: "Ctrl + 1 / 2 / 3", desc: "Focus Title / Body / Search" },
+            { cat: "", key: "Ctrl + F", desc: "Search Notes" },
+            { cat: "", key: "Alt + Arrows", desc: "Navigate List" },
+            { cat: "", key: "Ctrl + /", desc: "Show Shortcuts" },
+        ];
+        let html = `<table class="shortcut-table">`;
+        shortcuts.forEach(s => {
+            if(s.cat) html += `<tr><td colspan="2" class="shortcut-cat">${s.cat}</td></tr>`;
+            html += `<tr><td class="key">${s.key}</td><td class="desc">${s.desc}</td></tr>`;
+        });
+        html += `</table>`;
+        SystemUI.show("KEYBOARD CONTROLS", html);
+    }
+
+    // Public link handler
+    const urlParams = new URLSearchParams(window.location.search);
+    const shareId = urlParams.get('share');
+    const shareUser = urlParams.get('user');
+    if(shareId && shareUser) {
+        document.getElementById('auth-layer').style.display = 'none';
+        document.getElementById('app-layer').style.display = 'flex';
+        document.querySelector('header').style.display = 'none'; 
+        document.getElementById('sidebar').style.display = 'none';
+        document.getElementById('doc-body').setAttribute('readonly', true);
+        document.getElementById('doc-title').setAttribute('readonly', true);
+        document.querySelector('.editor-toolbar').innerHTML = '<div style="padding:10px; color:var(--neon-main); font-weight:bold;">:: PUBLIC VIEW MODE ::</div>';
+        db.ref(`notes/${shareUser}/${shareId}`).once('value').then(snap => {
+            if(snap.exists()) {
+                const val = snap.val();
+                document.getElementById('doc-title').value = val.title;
+                document.getElementById('doc-body').value = val.text;
+                toggleMarkdown();
+            } else {
+                alert("Shared note not found or access denied.");
+            }
+        });
+    }
+
+    function triggerSave() {  
+        document.getElementById('save-indicator').innerText = "[TYPING...]";  
+        updateWordCount();
+        if(document.getElementById('md-preview').classList.contains('active')) {
+             document.getElementById('md-preview').innerHTML = marked.parse(document.getElementById('doc-body').value);
+        }
+        clearTimeout(autoSaveTimer);  
+        autoSaveTimer = setTimeout(() => saveNote(true), 1500);
+    }  
+
+    document.getElementById('doc-title').oninput = triggerSave;  
+    document.getElementById('doc-body').oninput = triggerSave;  
+    
+    document.getElementById('search-bar').addEventListener('input', (e) => {
+        const term = e.target.value.toLowerCase();
+        document.querySelectorAll('.note-item').forEach(item => {
+            item.style.display = item.innerText.toLowerCase().includes(term) ? 'flex' : 'none';
+        });
+        logActivity("SEARCHING...", "info");
+    });
+    
+    function updateWordCount() {
+        const text = document.getElementById('doc-body').value || '';
+        const words = text.trim().split(/\s+/).filter(w => w.length > 0).length;
+        document.getElementById('word-count').innerText = `WORDS: ${words}`;
+    }
+
+    function clearEditor(passive = false) {
+        document.getElementById('current-id').value = '';  
+        document.getElementById('doc-title').value = '';  
+        document.getElementById('doc-body').value = '';  
+        document.getElementById('is-pinned').value = 'false';
+        document.getElementById('current-folder-ref').value = activeFolder === 'TRASH' ? 'INBOX' : activeFolder;
+        document.getElementById('del-btn').style.display = 'none';
+        document.getElementById('trash-ops').style.display = 'none';
+        if (!_readOnly) {
+            document.getElementById('doc-body').removeAttribute('readonly');
+            document.getElementById('doc-title').removeAttribute('readonly');
+        }
+        document.getElementById('date-display').innerText = '';
+        updatePinBtnUI(false);
+        document.querySelectorAll('.note-item').forEach(i => i.classList.remove('active'));
+        updateWordCount();
+        if(!passive) { document.getElementById('doc-title').focus(); logActivity("NEW WORKSPACE", "info"); }
+    }
+
+    function createNewNote() {
+        if (_readOnly) { logActivity("READ ONLY ACCESS — CANNOT CREATE", "error"); return; }
+        clearEditor(false);
+    }  
+    
+    function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); }  
+    function toggleFullScreen() {
+        if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+        else if (document.exitFullscreen) document.exitFullscreen();
+    }
+    
+    async function openMoveMenu() {
+        const id = document.getElementById('current-id').value;
+        if(!id) return logActivity("SELECT A NOTE TO MOVE", "error");
+        let html = `<div style="display:flex; flex-direction:column; gap:5px; max-height:200px; overflow-y:auto;">`;
+        knownFolders.forEach(folder => {
+             html += `<button class="btn" style="text-align:left;" onclick="moveNoteTo('${folder}')"><i class="fas fa-folder"></i> ${folder}</button>`;
+        });
+        html += `</div>`;
+        SystemUI.show("MOVE TO FOLDER", html);
+    }
+
+    function moveNoteTo(folder) {
+        const id = document.getElementById('current-id').value;
+        document.getElementById('current-folder-ref').value = folder;
+        const cache = getLocalCache();
+        if(cache[id]) { cache[id].folder = folder; setLocalCache(cache); }
+        saveNote(true); 
+        SystemUI.close();
+        renderFolders(getLocalCache()); 
+        renderNoteList(getLocalCache()); 
+        logActivity(`MOVED TO ${folder}`, "success");
+    }
+
+    function manipulateText(type) {
+        const ta = document.getElementById('doc-body');
+        const start = ta.selectionStart;
+        const end = ta.selectionEnd;
+        let text = ta.value;
+        if(type === 'timestamp') {
+            ta.value = text.substring(0, start) + new Date().toLocaleString() + text.substring(end);
+        }
+        ta.setSelectionRange(start, end); 
+        triggerSave();
+    }
+
+    document.addEventListener('keydown', async (e) => {
+        if(document.getElementById('modal-overlay').style.display === 'flex') return;
+        if(document.getElementById('cmd-palette').style.display === 'flex') return;
+        if (e.ctrlKey || e.altKey) {
+            if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'p') { e.preventDefault(); toggleCommandPalette(); }
+            if (e.ctrlKey && e.key.toLowerCase() === 's') { e.preventDefault(); saveNote(false); }
+            if (e.ctrlKey && e.key.toLowerCase() === 'n') { e.preventDefault(); createNewNote(); }
+            if (e.ctrlKey && e.key.toLowerCase() === 'd') { e.preventDefault(); moveToTrash(); }
+            if (e.ctrlKey && e.key.toLowerCase() === 'p') { e.preventDefault(); togglePin(); }
+            if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'f') { e.preventDefault(); toggleFullScreen(); }
+            if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'e') { e.preventDefault(); exportAllNotes(); }
+            if (e.altKey && (e.key === 'ArrowUp' || e.key === 'ArrowDown')) {
+                e.preventDefault();
+                const items = Array.from(document.querySelectorAll('.note-item'));
+                if(items.length === 0) return;
+                let activeIdx = items.findIndex(el => el.classList.contains('active'));
+                let targetIdx = activeIdx;
+                if (e.key === 'ArrowUp') targetIdx = activeIdx - 1;
+                if (e.key === 'ArrowDown') targetIdx = activeIdx + 1;
+                if(targetIdx < 0) targetIdx = 0;
+                if(targetIdx >= items.length) targetIdx = items.length - 1;
+                items[targetIdx].click();
+                items[targetIdx].scrollIntoView({block: 'center'});
+            }
+            if (e.ctrlKey && e.key === '1') { e.preventDefault(); document.getElementById('doc-title').focus(); }
+            if (e.ctrlKey && e.key === '2') { e.preventDefault(); document.getElementById('doc-body').focus(); }
+            if (e.ctrlKey && e.key === '3') { e.preventDefault(); document.getElementById('search-bar').focus(); }
+            if (e.ctrlKey && e.key.toLowerCase() === 'f') { e.preventDefault(); document.getElementById('search-bar').focus(); }
+            if (e.ctrlKey && e.key.toLowerCase() === 'z') { e.preventDefault(); editorUndo(); }
+            if (e.ctrlKey && e.key.toLowerCase() === 'y') { e.preventDefault(); editorRedo(); }
+            if (e.ctrlKey && e.key === '/') { e.preventDefault(); showShortcuts(); }
+            if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 't') { e.preventDefault(); manipulateText('timestamp'); }
+        }
+    });
+
+    setInterval(() => { document.getElementById('clock-display').innerText = new Date().toLocaleTimeString(); }, 1000);  
+
+    if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});  
+</script>
+
+</body>  
+</html>
